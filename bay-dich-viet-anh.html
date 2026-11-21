@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bẫy Dịch Việt Anh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&display=swap">
+<style>
+/* Layout: one study column. Header with overall progress -> tabs (cards / quiz / browse) -> shared scope filter -> active panel */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --sunk:#E8ECF3; --ink:#141B2D; --muted:#566178; --line:#D8DEE8;
+  --accent:#2445C8; --accent-soft:#E2E8FF; --on-accent:#FFFFFF;
+  --hl:#FFE36E; --hl-ink:#141B2D;
+  --good:#17803D; --good-soft:#E2F4E8; --bad:#C2312B; --bad-soft:#FCE9E8; --warn:#B45309;
+  --font-display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --font-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D121B; --surface:#151C29; --sunk:#1C2534; --ink:#E6EAF2; --muted:#9AA4B7; --line:#273145;
+    --accent:#8AA4FF; --accent-soft:#1E2A4A; --on-accent:#0D121B;
+    --hl:rgba(255,214,77,.22); --hl-ink:#FFE79A;
+    --good:#4ADE80; --good-soft:rgba(74,222,128,.13); --bad:#F87171; --bad-soft:rgba(248,113,113,.13); --warn:#FBBF24;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D121B; --surface:#151C29; --sunk:#1C2534; --ink:#E6EAF2; --muted:#9AA4B7; --line:#273145;
+  --accent:#8AA4FF; --accent-soft:#1E2A4A; --on-accent:#0D121B;
+  --hl:rgba(255,214,77,.22); --hl-ink:#FFE79A;
+  --good:#4ADE80; --good-soft:rgba(74,222,128,.13); --bad:#F87171; --bad-soft:rgba(248,113,113,.13); --warn:#FBBF24;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance}
+kbd{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;border:1px solid currentColor;border-radius:4px;padding:0 5px;opacity:.7}
+
+/* Header */
+.intro{padding-block:36px 8px}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0}
+h1{font-size:clamp(2rem,5.5vw,3rem);line-height:1.08;margin:.2em 0 .3em;font-weight:800;letter-spacing:-.02em}
+.lede{max-width:60ch;color:var(--muted);font-size:1.0625rem;margin:0}
+.progress{display:flex;align-items:center;gap:12px;margin-top:18px}
+.pbar{flex:1;height:10px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.pbar span{display:block;height:100%;width:0;background:var(--good);border-radius:inherit;transition:width .3s}
+#ptext{font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Tabs + filters */
+.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:12px;margin:22px 0 14px;overflow-x:auto}
+.tab{flex:1;white-space:nowrap;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:15px;padding:9px 14px;border-radius:9px;cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:16px}
+.filters label{font-size:14px;font-weight:600}
+select,input[type="search"]{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;max-width:100%}
+select{min-width:0;flex:1 1 260px}
+.chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+#scopeInfo{font-size:13px;color:var(--muted);flex-basis:100%}
+
+/* Buttons */
+.btn{font:inherit;font-weight:600;font-size:15px;border-radius:12px;padding:11px 18px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.good{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.btn.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.icon-btn{width:40px;height:40px;padding:0;flex:none;color:var(--accent);border-radius:10px}
+.no-speech .speak{display:none}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* Card */
+.deckbar{height:4px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-bottom:10px}
+.deckbar span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,36px);min-height:300px;display:flex;flex-direction:column;gap:16px;cursor:pointer}
+.card.flipped{cursor:default}
+.card-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:var(--muted);font-weight:600}
+.card-top .rule{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{display:inline-block;font-size:12px;font-weight:700;color:var(--warn);border:1px solid currentColor;border-radius:99px;padding:0 8px;margin-right:6px;white-space:nowrap}
+.prompt{margin:0;color:var(--muted);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.vn{margin:0;font-size:clamp(1.6rem,4.6vw,2.3rem);font-weight:800;line-height:1.2;text-wrap:balance}
+.flip-hint{margin:auto 0 0;color:var(--muted);font-size:14px}
+.back{display:grid;gap:14px;border-top:1px dashed var(--line);padding-top:18px}
+.lab{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin:0 0 2px}
+.lab.good{color:var(--good)}
+.lab.bad{color:var(--bad)}
+.right-row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.right{margin:0;font-family:var(--font-display);font-size:clamp(1.3rem,3.8vw,1.8rem);font-weight:700;line-height:1.3}
+.right b,.r-right b,.fb b{background:var(--hl);color:var(--hl-ink);padding:0 .15em;border-radius:3px;font-weight:inherit;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.wrong{margin:0;color:var(--muted);text-decoration:line-through;text-decoration-color:var(--bad);text-decoration-thickness:2px;font-size:16px}
+.note{margin:0;font-size:15px}
+.hook{margin:0;font-size:14px;color:var(--muted);background:var(--sunk);border-radius:10px;padding:10px 12px}
+.hook b{color:var(--ink)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.actions .btn{flex:1 1 160px}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:32px 24px;text-align:center;display:grid;gap:12px;justify-items:center}
+.state h2{margin:0;font-size:1.4rem}
+.state p{margin:0;color:var(--muted);max-width:46ch}
+.state .actions{justify-content:center;width:100%;max-width:440px}
+.stat-row{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.stat{display:grid;gap:0}
+.stat strong{font-family:var(--font-display);font-size:2rem;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.stat.good strong{color:var(--good)}
+.stat.bad strong{color:var(--bad)}
+
+/* Quiz */
+.quiz-box{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,36px);display:grid;gap:16px}
+.options{display:grid;gap:10px}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--font-display);font-size:17px;font-weight:600;cursor:pointer;line-height:1.35}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.good{border-color:var(--good);background:var(--good-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt kbd{flex:none;font-family:var(--font-body)}
+.fb{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:16px}
+.fb-title{margin:0;font-weight:800;font-size:17px}
+.fb-title.good{color:var(--good)}
+.fb-title.bad{color:var(--bad)}
+.fb p{margin:0}
+#qScore{font-variant-numeric:tabular-nums}
+
+/* Browse */
+.browse-top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-bottom:16px}
+.browse-top input{flex:1 1 260px}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.group{margin-bottom:26px}
+.group h3{font-size:1.1rem;margin:0 0 4px;font-weight:800}
+.group h3 small{color:var(--accent);font-family:var(--font-display);margin-right:6px}
+.ghook{margin:0 0 10px;font-size:14px;color:var(--muted);max-width:70ch}
+.ghook b{color:var(--ink)}
+.rows{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:grid;grid-template-columns:10px minmax(0,1fr) minmax(0,.9fr) minmax(0,1.3fr) 40px;gap:14px;align-items:center;padding:10px 12px 10px 14px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row p{margin:0}
+.r-vn{font-weight:600}
+.r-wrong{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--bad);font-size:15px}
+.r-right{font-family:var(--font-display);font-weight:700}
+.r-note{display:block;font-family:var(--font-body);font-weight:400;font-size:13px;color:var(--muted);margin-top:2px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dot.l1{background:var(--warn)}
+.dot.l2{background:var(--good)}
+.count{font-size:13px;color:var(--muted);margin:0 0 12px}
+@media (max-width:680px){
+  .row{grid-template-columns:10px minmax(0,1fr) 40px;gap:2px 12px;align-items:start}
+  .row .dot{grid-column:1;grid-row:1;margin-top:8px}
+  .row .r-vn,.row .r-right,.row .r-wrong{grid-column:2}
+  .row .r-vn{grid-row:1}.row .r-right{grid-row:2}.row .r-wrong{grid-row:3}
+  .row .speak{grid-column:3;grid-row:1 / span 3}
+}
+
+.foot{padding-block:28px 40px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="wrap intro">
+  <p class="eyebrow" id="eyebrow">Tiếng Anh tự nhiên</p>
+  <h1>Bẫy Dịch Việt → Anh</h1>
+  <p class="lede">Nhìn câu tiếng Việt, tự nói câu tiếng Anh trong đầu, rồi lật thẻ xem người bản xứ nói thế nào. Câu nào nhớ rồi thì bấm "Nhớ rồi", câu nào chưa thì thẻ sẽ quay lại sau.</p>
+  <div class="progress"><div class="pbar"><span id="pfill"></span></div><span id="ptext">Đã nhớ 0</span></div>
+</header>
+
+<main class="wrap">
+  <div class="tabs" role="tablist" aria-label="Chế độ học">
+    <button class="tab" role="tab" id="t-cards" aria-controls="p-cards" data-tab="cards">Thẻ nhớ</button>
+    <button class="tab" role="tab" id="t-quiz" aria-controls="p-quiz" data-tab="quiz">Chọn câu đúng</button>
+    <button class="tab" role="tab" id="t-browse" aria-controls="p-browse" data-tab="browse">Tra cứu</button>
+  </div>
+
+  <div class="filters">
+    <label for="scope">Học phần</label>
+    <select id="scope"></select>
+    <label class="chk" for="onlyNew"><input type="checkbox" id="onlyNew">Chỉ câu chưa nhớ</label>
+    <span id="scopeInfo"></span>
+  </div>
+
+  <!-- Cards -->
+  <section id="p-cards" role="tabpanel" aria-labelledby="t-cards">
+    <div id="cardWrap">
+      <div class="deckbar"><span id="deckFill"></span></div>
+      <div class="card" id="card" tabindex="0" role="button" aria-label="Lật thẻ">
+        <div class="card-top"><span class="rule"><span class="pill" id="cStar">Hay gặp</span><span id="cRule"></span></span><span id="cCount"></span></div>
+        <p class="prompt">Người bản xứ nói thế nào?</p>
+        <p class="vn" id="cVn"></p>
+        <p class="flip-hint" id="cHint">Nói thầm câu tiếng Anh của bạn, rồi bấm vào thẻ hoặc nhấn <kbd>Space</kbd> để lật.</p>
+        <div class="back" id="cBack" hidden>
+          <div>
+            <p class="lab good">Người bản xứ nói</p>
+            <div class="right-row"><p class="right" id="cRight"></p><button class="btn icon-btn speak" type="button" id="cSpeak" aria-label="Nghe phát âm"></button></div>
+          </div>
+          <div>
+            <p class="lab bad">Dịch từng chữ, nghe lạ</p>
+            <p class="wrong" id="cWrong"></p>
+          </div>
+          <p class="note" id="cNote"></p>
+          <p class="hook" id="cHook"></p>
+        </div>
+      </div>
+      <div class="actions" id="cFlipRow"><button class="btn primary" type="button" id="bFlip">Lật thẻ <kbd>Space</kbd></button></div>
+      <div class="actions" id="cGrade" hidden>
+        <button class="btn bad" type="button" id="bAgain">Chưa nhớ <kbd>1</kbd></button>
+        <button class="btn good" type="button" id="bKnow">Nhớ rồi <kbd>2</kbd></button>
+      </div>
+    </div>
+    <div class="state" id="cardDone" hidden>
+      <h2>Xong lượt này</h2>
+      <div class="stat-row">
+        <div class="stat good"><strong id="dKnown">0</strong><span>thẻ đã nhớ</span></div>
+        <div class="stat bad"><strong id="dAgain">0</strong><span>thẻ cần ôn</span></div>
+      </div>
+      <p>Mỗi lượt có tối đa 20 thẻ. Thẻ chưa nhớ được ưu tiên ở lượt sau.</p>
+      <div class="actions">
+        <button class="btn" type="button" id="bReview">Ôn lại thẻ chưa nhớ</button>
+        <button class="btn primary" type="button" id="bNewDeck">Lượt mới</button>
+      </div>
+    </div>
+    <div class="state" id="cardEmpty" hidden>
+      <h2>Bạn đã nhớ hết phần này</h2>
+      <p>Bỏ chọn "Chỉ câu chưa nhớ" để ôn lại, hoặc chọn học phần khác.</p>
+    </div>
+  </section>
+
+  <!-- Quiz -->
+  <section id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="quiz-box" id="quizBox">
+      <div class="card-top"><span class="rule" id="qRule"></span><span id="qScore">Đúng 0 / 0</span></div>
+      <p class="prompt">Câu nào người bản xứ nói?</p>
+      <p class="vn" id="qVn"></p>
+      <div class="options" id="qOpts"></div>
+      <div class="fb" id="qFb" hidden></div>
+      <div class="actions" id="qNextRow" hidden><button class="btn primary" type="button" id="qNext">Câu tiếp <kbd>Enter</kbd></button></div>
+    </div>
+    <div class="state" id="quizEmpty" hidden>
+      <h2>Không có câu nào để hỏi</h2>
+      <p>Học phần này không có câu trắc nghiệm, hoặc bạn đã nhớ hết. Hãy chọn học phần khác hoặc bỏ chọn "Chỉ câu chưa nhớ".</p>
+    </div>
+  </section>
+
+  <!-- Browse -->
+  <section id="p-browse" role="tabpanel" aria-labelledby="t-browse" hidden>
+    <div class="browse-top">
+      <label for="q" class="sr" hidden>Tìm kiếm</label>
+      <input type="search" id="q" placeholder="Tìm: đèn, take, bored, họp…" autocomplete="off">
+      <div class="legend"><span><i class="dot"></i>Chưa học</span><span><i class="dot l1"></i>Đang học</span><span><i class="dot l2"></i>Đã nhớ</span></div>
+    </div>
+    <p class="count" id="bCount"></p>
+    <div id="bList"></div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <span>Tiến độ được lưu trong trình duyệt này. Tài liệu đầy đủ: bay-dich-viet-anh.md</span>
+  <button class="linkbtn" type="button" id="bReset">Xóa tiến độ</button>
+</footer>
+
+<script>
+const DATA = [{"id":"A","title":"Động từ: tiếng Việt một từ, tiếng Anh nhiều từ","intro":"Tiếng Việt dùng một động từ cho nhiều việc (\"mở\", \"làm\", \"xem\", \"chơi\", \"học\"). Tiếng Anh chọn động từ theo đối tượng, nên dịch thẳng là sai.","rules":[{"id":"A1","title":"Mở, bật, tắt, đóng","why":"Tiếng Việt \"mở\" dùng cho cả cửa lẫn đèn. Tiếng Anh tách ra theo loại đồ vật.","hook":"Thiết bị chạy bằng điện → **turn on / turn off**. Thứ có cánh, có nắp → **open / close**.","items":[{"id":"A1-0","v":"Bật đèn","w":"open the light","r":"**turn on** the light","n":"","s":true},{"id":"A1-1","v":"Tắt quạt","w":"close the fan","r":"**turn off** the fan","n":"","s":false},{"id":"A1-2","v":"Bật máy lạnh","w":"open the air conditioner","r":"**turn on** the AC","n":"","s":false},{"id":"A1-3","v":"Mở TV","w":"open the TV","r":"**turn on** the TV","n":"","s":false},{"id":"A1-4","v":"Vặn to / nhỏ tiếng","w":"make the sound big / small","r":"**turn up / turn down** the volume","n":"","s":false},{"id":"A1-5","v":"Mở nhạc","w":"open music","r":"**put on** some music / **play** some music","n":"","s":false},{"id":"A1-6","v":"Tắt máy tính","w":"close the computer","r":"**shut down** the computer","n":"\"close the laptop\" là gập máy lại","s":false},{"id":"A1-7","v":"Đóng ứng dụng","w":"turn off the app","r":"**close** the app","n":"App không phải thiết bị điện","s":false},{"id":"A1-8","v":"Mở khóa điện thoại","w":"open the phone","r":"**unlock** the phone","n":"","s":false}]},{"id":"A2","title":"Làm: make hay do","why":"Tiếng Việt chỉ có \"làm\". Tiếng Anh chia thành make và do, và phải nhớ theo cụm.","hook":"**make** = làm ra một thứ gì đó (quyết định, tiền, kế hoạch, đồ uống). **do** = thực hiện một việc, một nhiệm vụ.","items":[{"id":"A2-0","v":"Mắc lỗi","w":"do a mistake","r":"**make** a mistake","n":"","s":true},{"id":"A2-1","v":"Ra quyết định","w":"do a decision","r":"**make** a decision","n":"","s":true},{"id":"A2-2","v":"Kiếm tiền","w":"find money","r":"**make** money","n":"","s":false},{"id":"A2-3","v":"Kết bạn","w":"connect friends","r":"**make** friends","n":"","s":false},{"id":"A2-4","v":"Lên kế hoạch","w":"do a plan","r":"**make** a plan","n":"","s":false},{"id":"A2-5","v":"Gọi điện thoại","w":"do a call","r":"**make** a phone call / **give** someone a call","n":"","s":false},{"id":"A2-6","v":"Pha cà phê","w":"do coffee","r":"**make** coffee","n":"","s":false},{"id":"A2-7","v":"Làm ồn","w":"do noise","r":"**make** noise","n":"","s":false},{"id":"A2-8","v":"Đặt lịch hẹn","w":"do an appointment","r":"**make** an appointment","n":"","s":false},{"id":"A2-9","v":"Tiến bộ","w":"do progress","r":"**make** progress","n":"","s":false},{"id":"A2-10","v":"Làm bài tập","w":"make homework","r":"**do** homework","n":"","s":true},{"id":"A2-11","v":"Rửa bát","w":"wash bowls","r":"**do** the dishes","n":"","s":false},{"id":"A2-12","v":"Giặt đồ","w":"make the laundry","r":"**do** the laundry","n":"","s":false},{"id":"A2-13","v":"Tập thể dục","w":"make exercise","r":"**do** exercise / **work out**","n":"","s":false},{"id":"A2-14","v":"Cố gắng hết sức","w":"make my best","r":"**do** my best","n":"","s":false},{"id":"A2-15","v":"Giúp tôi một việc","w":"make me a help","r":"**do** me a favor","n":"","s":false},{"id":"A2-16","v":"Nghiên cứu","w":"make research","r":"**do** research","n":"","s":false},{"id":"A2-17","v":"Làm ăn, kinh doanh","w":"make business","r":"**do** business","n":"","s":false}]},{"id":"A3","title":"Take: một động từ cho nhiều việc","why":"Tiếng Việt dùng \"uống, chụp, tắm, đi, mất…\". Tiếng Anh gom phần lớn vào take.","hook":"Hành động làm **một lần**, hoặc **nhận lấy** một thứ (thuốc, ảnh, xe, thời gian) → thử **take** trước.","items":[{"id":"A3-0","v":"Uống thuốc","w":"drink medicine","r":"**take** medicine","n":"","s":true},{"id":"A3-1","v":"Chụp ảnh","w":"shoot a photo","r":"**take** a photo","n":"","s":false},{"id":"A3-2","v":"Đi tắm","w":"go bath","r":"**take** a shower","n":"","s":false},{"id":"A3-3","v":"Ngủ trưa","w":"sleep noon","r":"**take** a nap","n":"","s":false},{"id":"A3-4","v":"Nghỉ giải lao","w":"rest a little","r":"**take** a break","n":"","s":false},{"id":"A3-5","v":"Nghỉ phép một ngày","w":"rest one day","r":"**take** a day off","n":"","s":true},{"id":"A3-6","v":"Đi taxi","w":"sit taxi","r":"**take** a taxi","n":"","s":false},{"id":"A3-7","v":"Đi xe buýt","w":"sit bus","r":"**take** the bus","n":"","s":false},{"id":"A3-8","v":"Mất 30 phút","w":"lose 30 minutes","r":"it **takes** 30 minutes","n":"\"lose time\" là phí thời gian","s":false},{"id":"A3-9","v":"Đi dạo","w":"go walk around","r":"**take** a walk / **go for** a walk","n":"","s":false},{"id":"A3-10","v":"Đi thi","w":"join the exam","r":"**take** an exam","n":"","s":false},{"id":"A3-11","v":"Ghi chép","w":"write notes","r":"**take** notes","n":"","s":false},{"id":"A3-12","v":"Cứ từ từ","w":"slowly slowly","r":"**take** your time","n":"","s":false},{"id":"A3-13","v":"Giữ gìn sức khỏe nhé","w":"keep health","r":"**take care** (of yourself)","n":"","s":false}]},{"id":"A4","title":"Chơi và đi chơi","why":"\"Chơi\" trong tiếng Việt dùng cho cả trẻ con lẫn người lớn. Người lớn nói \"play\" nghe như trẻ con đi chơi.","hook":"**play** chỉ dùng cho trò chơi, thể thao, nhạc cụ và trẻ con. Người lớn đi chơi là **go out / hang out**.","items":[{"id":"A4-0","v":"Đi chơi với bạn","w":"play with friends","r":"**hang out** with friends","n":"","s":true},{"id":"A4-1","v":"Tối nay đi chơi không?","w":"tonight go play?","r":"Do you want to **go out** tonight?","n":"","s":false},{"id":"A4-2","v":"Cuối tuần tôi đi chơi","w":"weekend I go play","r":"I **went out** on the weekend","n":"","s":false},{"id":"A4-3","v":"Đi chơi xa","w":"go play far","r":"go on a **trip**","n":"","s":false},{"id":"A4-4","v":"Đi du lịch","w":"go travel","r":"**travel** / go on **vacation**","n":"","s":false},{"id":"A4-5","v":"Ghé nhà tôi chơi","w":"come my house play","r":"**come over** to my place","n":"","s":false},{"id":"A4-6","v":"Chơi game","w":"play game","r":"play **games** / play **video games**","n":"","s":false},{"id":"A4-7","v":"Chơi đàn guitar","w":"play guitar","r":"play **the** guitar","n":"Nhạc cụ có \"the\"","s":false},{"id":"A4-8","v":"Chơi bóng đá","w":"play the football","r":"play football","n":"Thể thao không có \"the\"","s":false}]},{"id":"A5","title":"Xem, nhìn, thấy, trông","why":"Tiếng Việt \"xem\" dùng cho mọi thứ. Tiếng Anh chọn từ theo cách bạn dùng mắt.","hook":"**watch** = theo dõi thứ đang chuyển động. **look at** = chủ động nhìn vào. **see** = mắt tự thấy. **look** + tính từ = trông có vẻ.","items":[{"id":"A5-0","v":"Xem TV","w":"see TV","r":"**watch** TV","n":"","s":true},{"id":"A5-1","v":"Xem bóng đá","w":"see football","r":"**watch** the game","n":"","s":false},{"id":"A5-2","v":"Xem ảnh","w":"watch photos","r":"**look at** photos","n":"","s":false},{"id":"A5-3","v":"Nhìn kìa!","w":"see there!","r":"**Look!**","n":"","s":false},{"id":"A5-4","v":"Đi xem phim","w":"go see film","r":"**go to the movies** / **see** a movie","n":"","s":false},{"id":"A5-5","v":"Xem giúp tôi cái này","w":"see help me","r":"Could you **take a look**?","n":"","s":false},{"id":"A5-6","v":"Trông bạn mệt","w":"you see tired","r":"you **look** tired","n":"","s":true},{"id":"A5-7","v":"Trông giống bố","w":"look same dad","r":"**look like** your dad","n":"","s":false},{"id":"A5-8","v":"Xem lại bài","w":"see the lesson again","r":"**go over** the lesson / **review** the lesson","n":"","s":false}]},{"id":"A6","title":"Nói, kể, bảo, nghe","why":"Tiếng Việt chỉ có \"nói\" và \"nghe\". Tiếng Anh có 4 từ cho \"nói\" và 2 từ cho \"nghe\".","hook":"**speak** + ngôn ngữ · **talk to** + người · **say** + lời nói · **tell** + người + chuyện. **listen to** = chủ động nghe · **hear** = tai tự nghe thấy.","items":[{"id":"A6-0","v":"Nghe nhạc","w":"listen music","r":"**listen to** music","n":"","s":true},{"id":"A6-1","v":"Tôi nghe thấy tiếng lạ","w":"I listen a strange sound","r":"I **hear** a strange noise","n":"","s":false},{"id":"A6-2","v":"Tôi nghe nói là…","w":"I listen that…","r":"I **heard** that…","n":"","s":false},{"id":"A6-3","v":"Nói tiếng Anh","w":"talk English","r":"**speak** English","n":"","s":false},{"id":"A6-4","v":"Nói chuyện với sếp","w":"speak my boss","r":"**talk to** my boss","n":"","s":false},{"id":"A6-5","v":"Anh ấy nói với tôi là…","w":"he said me that…","r":"he **told** me that… / he **said** that…","n":"","s":true},{"id":"A6-6","v":"Nói xin chào","w":"speak hello","r":"**say** hello","n":"","s":false},{"id":"A6-7","v":"Kể chuyện","w":"speak a story","r":"**tell** a story","n":"","s":false},{"id":"A6-8","v":"Bảo anh ấy gọi lại cho tôi","w":"say him call me back","r":"**tell** him to call me back","n":"","s":false},{"id":"A6-9","v":"Nói dối","w":"speak lie","r":"**tell** a lie","n":"","s":false},{"id":"A6-10","v":"Nói đùa thôi","w":"speak joke only","r":"I'm just **kidding**","n":"","s":false},{"id":"A6-11","v":"Nói thật đi","w":"speak true","r":"**tell** me the truth","n":"","s":false}]},{"id":"A7","title":"Đi lại: lên, xuống, đón, đưa","why":"Tiếng Việt dùng \"đi, lên, xuống\" cho mọi phương tiện. Tiếng Anh đổi từ theo loại xe.","hook":"Xe đứng được bên trong (bus, tàu, máy bay) → **get on / get off**. Xe phải cúi người vào (ô tô, taxi) → **get in / get out of**. Xe máy, xe đạp → **ride**. Ô tô → **drive**.","items":[{"id":"A7-0","v":"Đi xe máy","w":"drive motorbike","r":"**ride** a motorbike / go **by** motorbike","n":"","s":true},{"id":"A7-1","v":"Lái ô tô","w":"ride a car","r":"**drive** a car","n":"","s":false},{"id":"A7-2","v":"Lên xe buýt","w":"go up bus","r":"**get on** the bus","n":"","s":false},{"id":"A7-3","v":"Xuống tàu","w":"go down train","r":"**get off** the train","n":"","s":false},{"id":"A7-4","v":"Lên taxi","w":"go up taxi","r":"**get in** the taxi","n":"","s":false},{"id":"A7-5","v":"Xuống xe ô tô","w":"go down car","r":"**get out of** the car","n":"","s":false},{"id":"A7-6","v":"Tôi sẽ đón bạn","w":"I will welcome you","r":"I'll **pick** you **up**","n":"","s":true},{"id":"A7-7","v":"Đưa bạn về nhà","w":"bring you home","r":"I'll **take** you home / I'll **drive** you home","n":"","s":false},{"id":"A7-8","v":"Cho tôi xuống ở đây","w":"let me down here","r":"You can **drop** me **off** here","n":"","s":false},{"id":"A7-9","v":"Lỡ chuyến xe buýt","w":"lose the bus","r":"**miss** the bus","n":"","s":false},{"id":"A7-10","v":"Đến nơi thì nhắn tôi","w":"come place text me","r":"Text me when you **get there**","n":"","s":false},{"id":"A7-11","v":"Kẹt xe","w":"stuck car","r":"I **got stuck in traffic**","n":"","s":false}]},{"id":"A8","title":"Học","why":"Tiếng Việt \"học\" dùng cho mọi việc liên quan đến học. Tiếng Anh tách theo mục đích.","hook":"**study** = ngồi học · **learn** = biết thêm điều mới · **review** = ôn lại · **memorize** = học thuộc.","items":[{"id":"A8-0","v":"Học bài","w":"learn lesson","r":"**study** / **do** my homework","n":"","s":false},{"id":"A8-1","v":"Ôn thi","w":"review exam","r":"**study for** the exam","n":"","s":false},{"id":"A8-2","v":"Ôn lại bài","w":"learn again","r":"**review** the lesson / **go over** the lesson","n":"","s":false},{"id":"A8-3","v":"Học thuộc","w":"remember the lesson","r":"**memorize** it / learn it **by heart**","n":"","s":false},{"id":"A8-4","v":"Tôi học được nhiều điều","w":"I studied many things","r":"I **learned** a lot","n":"","s":false},{"id":"A8-5","v":"Đi học","w":"go learn","r":"**go to school** / **go to class**","n":"","s":false},{"id":"A8-6","v":"Học đại học","w":"learn university","r":"**go to** university / **go to** college","n":"","s":false},{"id":"A8-7","v":"Học thêm","w":"learn more","r":"**take extra classes**","n":"","s":false},{"id":"A8-8","v":"Học lái xe","w":"study driving","r":"**learn to drive**","n":"","s":true}]}]},{"id":"B","title":"Tính từ và cảm xúc","intro":"Tiếng Việt dùng một từ cho cả người lẫn vật, và ghép tính từ với danh từ khá tự do. Tiếng Anh thì không.","rules":[{"id":"B1","title":"-ed hay -ing","why":"Tiếng Việt \"chán\" dùng cho cả người lẫn phim. Tiếng Anh: người cảm thấy dùng -ed, thứ gây ra cảm giác dùng -ing.","hook":"**-ed** = tôi cảm thấy (I'm bored). **-ing** = nó làm người ta cảm thấy vậy (It's boring). Nói \"I'm boring\" là tự nhận mình nhạt nhẽo.","items":[{"id":"B1-0","v":"Tôi thấy chán","w":"I'm boring","r":"I'm **bored**","n":"","s":true},{"id":"B1-1","v":"Phim này chán","w":"this movie is bored","r":"this movie is **boring**","n":"","s":false},{"id":"B1-2","v":"Tôi hứng thú với AI","w":"I'm interesting in AI","r":"I'm **interested** in AI","n":"","s":true},{"id":"B1-3","v":"Tôi mệt","w":"I'm tiring","r":"I'm **tired**","n":"","s":false},{"id":"B1-4","v":"Công việc này mệt","w":"this job is tired","r":"this job is **tiring**","n":"","s":false},{"id":"B1-5","v":"Tôi hào hứng lắm","w":"I'm so exciting","r":"I'm so **excited**","n":"","s":false},{"id":"B1-6","v":"Tôi bối rối","w":"I'm confusing","r":"I'm **confused**","n":"","s":false},{"id":"B1-7","v":"Tôi ngạc nhiên","w":"I'm surprising","r":"I'm **surprised**","n":"","s":false},{"id":"B1-8","v":"Tôi xấu hổ quá","w":"I'm so embarrassing","r":"I'm so **embarrassed**","n":"","s":false},{"id":"B1-9","v":"Tôi thất vọng","w":"I'm disappointing","r":"I'm **disappointed**","n":"","s":false},{"id":"B1-10","v":"Tôi lo lắng","w":"I'm worry","r":"I'm **worried**","n":"","s":false},{"id":"B1-11","v":"Kỳ nghỉ rất thư giãn","w":"the holiday was very relaxed","r":"the holiday was really **relaxing**","n":"","s":false}]},{"id":"B2","title":"Từ cảm xúc dễ nhầm","why":"Một số từ tiếng Anh nhìn giống nghĩa tiếng Việt nhưng sắc thái khác hẳn.","hook":"**fun** = vui (trải nghiệm) · **funny** = buồn cười. **miss** = nhớ ai · **remember** = nhớ ra. **very** không đứng trước động từ: nói **really like**.","items":[{"id":"B2-0","v":"Tôi rất thích","w":"I very like","r":"I **really** like / I like it **a lot**","n":"\"very\" không đứng trước động từ","s":true},{"id":"B2-1","v":"Chuyến đi rất vui","w":"the trip was very funny","r":"the trip was really **fun**","n":"\"funny\" = buồn cười","s":true},{"id":"B2-2","v":"Anh ấy vui tính","w":"he has fun character","r":"he's **funny** / he's **fun to be around**","n":"","s":false},{"id":"B2-3","v":"Rất vui được gặp bạn","w":"very fun to meet you","r":"**Nice to meet you**","n":"","s":false},{"id":"B2-4","v":"Tôi nhớ bạn","w":"I remember you","r":"I **miss** you","n":"\"remember\" = nhớ ra, không quên","s":false},{"id":"B2-5","v":"Tôi bực mình","w":"I'm uncomfortable","r":"I'm **annoyed**","n":"\"uncomfortable\" = không thoải mái, ngượng","s":false},{"id":"B2-6","v":"Tôi bị stress","w":"I'm stress","r":"I'm **stressed out**","n":"","s":false},{"id":"B2-7","v":"Tiếc quá","w":"so regret","r":"**That's too bad** / **What a pity**","n":"","s":false},{"id":"B2-8","v":"Tôi để quên ví ở nhà","w":"I forget wallet in home","r":"I **left** my wallet at home","n":"","s":false},{"id":"B2-9","v":"Anh ấy tốt bụng","w":"he has good belly","r":"he's **kind** / he's really **nice**","n":"","s":false}]},{"id":"B3","title":"Tính từ đi với danh từ","why":"Tiếng Việt \"to, mạnh, đậm, cao\" ghép với gì cũng được. Tiếng Anh có những cặp cố định, phải học theo cụm.","hook":"Học cả cụm, đừng học từ lẻ: **heavy** rain, **strong** coffee, **close** friend, **tall** person.","items":[{"id":"B3-0","v":"Mưa to","w":"big rain","r":"**heavy** rain","n":"","s":true},{"id":"B3-1","v":"Đường đông xe","w":"many cars","r":"**heavy** traffic / the traffic is **bad**","n":"","s":false},{"id":"B3-2","v":"Gió mạnh","w":"big wind","r":"**strong** wind","n":"","s":false},{"id":"B3-3","v":"Cà phê đậm","w":"thick coffee","r":"**strong** coffee","n":"","s":true},{"id":"B3-4","v":"Trà nhạt","w":"light tea","r":"**weak** tea","n":"","s":false},{"id":"B3-5","v":"Bạn thân","w":"near friend","r":"**close** friend / **best** friend","n":"","s":false},{"id":"B3-6","v":"Người cao","w":"high person","r":"**tall** person","n":"\"high\" dùng cho núi, tòa nhà, giá cả","s":false},{"id":"B3-7","v":"Giá cao","w":"expensive price","r":"**high** price","n":"\"expensive\" đi với đồ vật: an expensive phone","s":false},{"id":"B3-8","v":"Vấn đề nghiêm trọng","w":"heavy problem","r":"**serious** problem","n":"","s":false},{"id":"B3-9","v":"Chỗ đông người","w":"many people place","r":"a **crowded** place","n":"","s":false},{"id":"B3-10","v":"Đồ ăn nhanh","w":"quick food","r":"**fast** food","n":"","s":false},{"id":"B3-11","v":"Ngủ ngon nhé","w":"sleep delicious","r":"**Sleep well** / **Good night**","n":"","s":false},{"id":"B3-12","v":"Gọi nhầm số","w":"call mistake number","r":"**wrong** number","n":"","s":false}]}]},{"id":"C","title":"Giới từ: thiếu hoặc thừa","intro":"Tiếng Việt ít dùng từ nối sau động từ. Tiếng Anh thì có động từ bắt buộc phải có giới từ, có động từ lại không được thêm.","rules":[{"id":"C1","title":"Thiếu giới từ","why":"Tiếng Việt nói \"chờ tôi, nghe nhạc, nhìn bức ảnh\" mà không cần từ nối. Nhiều động từ tiếng Anh bắt buộc có giới từ đi kèm.","hook":"Học động từ kèm giới từ như một từ: **wait for · look at · look for · listen to · talk to · depend on · pay for · ask for**.","items":[{"id":"C1-0","v":"Chờ tôi với","w":"wait me","r":"**wait for** me","n":"","s":true},{"id":"C1-1","v":"Nhìn bức ảnh này","w":"look this picture","r":"**look at** this picture","n":"","s":false},{"id":"C1-2","v":"Tôi đang tìm chìa khóa","w":"I'm looking my keys","r":"I'm **looking for** my keys","n":"","s":true},{"id":"C1-3","v":"Nói chuyện với anh ấy","w":"talk him","r":"**talk to** him","n":"","s":false},{"id":"C1-4","v":"Còn tùy bạn","w":"depend you","r":"it **depends on** you","n":"","s":false},{"id":"C1-5","v":"Trả tiền cà phê","w":"pay the coffee","r":"**pay for** the coffee","n":"pay + người / hóa đơn, pay for + món đồ","s":false},{"id":"C1-6","v":"Xin việc","w":"apply a job","r":"**apply for** a job","n":"","s":false},{"id":"C1-7","v":"Xin lời khuyên","w":"ask advice","r":"**ask for** advice","n":"","s":false},{"id":"C1-8","v":"Lo về công việc","w":"worry work","r":"**worry about** work","n":"","s":false},{"id":"C1-9","v":"Để tôi nghĩ về việc đó","w":"let me think it","r":"let me **think about** it","n":"","s":false},{"id":"C1-10","v":"Cái này của tôi","w":"this belongs me","r":"this **belongs to** me","n":"","s":false},{"id":"C1-11","v":"Đến sân bay","w":"arrive the airport","r":"**arrive at** the airport","n":"","s":false},{"id":"C1-12","v":"Cười anh ấy","w":"laugh him","r":"**laugh at** him","n":"","s":false},{"id":"C1-13","v":"Giải thích cho tôi","w":"explain me","r":"**explain** it **to** me","n":"","s":false}]},{"id":"C2","title":"Thừa giới từ","why":"Ngược lại, tiếng Việt có \"về, với, đến\" nên ta hay thêm vào những động từ tiếng Anh không cần.","hook":"Những động từ này đi thẳng với tân ngữ, không thêm gì: **discuss · contact · call · visit · marry · enter · attend · answer · reach · mention**. Và **go home** không có \"to\".","items":[{"id":"C2-0","v":"Thảo luận về vấn đề","w":"discuss about the problem","r":"**discuss** the problem","n":"","s":true},{"id":"C2-1","v":"Liên hệ với tôi","w":"contact with me","r":"**contact** me","n":"","s":false},{"id":"C2-2","v":"Gọi cho tôi","w":"call to me","r":"**call** me","n":"","s":false},{"id":"C2-3","v":"Thăm bố mẹ","w":"visit to my parents","r":"**visit** my parents","n":"","s":false},{"id":"C2-4","v":"Kết hôn với cô ấy","w":"marry with her","r":"**marry** her / **get married to** her","n":"","s":true},{"id":"C2-5","v":"Vào phòng","w":"enter into the room","r":"**enter** the room / **go into** the room","n":"","s":false},{"id":"C2-6","v":"Tham dự cuộc họp","w":"attend to the meeting","r":"**attend** the meeting","n":"","s":false},{"id":"C2-7","v":"Nghe máy","w":"answer to the phone","r":"**answer** the phone","n":"","s":false},{"id":"C2-8","v":"Về nhà","w":"go to home","r":"**go home**","n":"","s":true},{"id":"C2-9","v":"Liên lạc được với anh ấy","w":"reach to him","r":"**reach** him","n":"","s":false},{"id":"C2-10","v":"Giải thích về vấn đề","w":"explain about the problem","r":"**explain** the problem","n":"","s":false},{"id":"C2-11","v":"Nhắc đến chuyện đó","w":"mention about it","r":"**mention** it","n":"","s":false}]},{"id":"C3","title":"Thời gian và nơi chốn","why":"Tiếng Việt ghép \"tối qua, sáng nay, tuần sau\" rất tự do. Tiếng Anh có cách nói cố định, dịch từng chữ sẽ sai.","hook":"**last** night · **this** morning · **tonight** · **next** week (không có \"the\") · **at** night · **on** Monday · **at** 7 o'clock · 3 days **ago**.","items":[{"id":"C3-0","v":"Tối qua","w":"yesterday night","r":"**last night**","n":"","s":true},{"id":"C3-1","v":"Sáng nay","w":"today morning","r":"**this morning**","n":"","s":true},{"id":"C3-2","v":"Chiều nay","w":"today afternoon","r":"**this afternoon**","n":"","s":false},{"id":"C3-3","v":"Tối nay","w":"today night","r":"**tonight**","n":"","s":false},{"id":"C3-4","v":"Tuần sau","w":"the next week","r":"**next week**","n":"","s":false},{"id":"C3-5","v":"Năm ngoái","w":"the last year","r":"**last year**","n":"","s":false},{"id":"C3-6","v":"Vào buổi tối","w":"in the night","r":"**at night** / **in the evening**","n":"","s":false},{"id":"C3-7","v":"Vào thứ Hai","w":"in Monday","r":"**on** Monday","n":"","s":false},{"id":"C3-8","v":"Lúc 7 giờ","w":"in 7 o'clock","r":"**at** 7 o'clock","n":"","s":false},{"id":"C3-9","v":"Ở nhà","w":"in home","r":"**at home**","n":"","s":false},{"id":"C3-10","v":"Ở công ty","w":"in company","r":"**at work** / **at the office**","n":"","s":false},{"id":"C3-11","v":"Đúng giờ","w":"correct time","r":"**on time**","n":"","s":false},{"id":"C3-12","v":"3 ngày trước","w":"before 3 days","r":"3 days **ago**","n":"","s":false},{"id":"C3-13","v":"2 tiếng nữa","w":"after 2 hours","r":"**in** 2 hours","n":"\"in\" = sau khoảng thời gian tính từ bây giờ","s":false}]}]},{"id":"D","title":"Cấu trúc câu kiểu tiếng Việt","intro":"Đây là các lỗi do giữ nguyên cách đặt câu của tiếng Việt: dùng \"có\", ghép cặp \"tuy… nhưng\", thêm \"là\", không đổi động từ theo thời gian.","rules":[{"id":"D1","title":"Có: there is hay have","why":"Tiếng Việt \"có\" dùng cho cả sở hữu lẫn tồn tại. Tiếng Anh tách thành hai cách nói.","hook":"Ai đó **sở hữu** cái gì → **have**. Ở đâu đó **tồn tại** cái gì → **there is / there are**.","items":[{"id":"D1-0","v":"Có nhiều người","w":"have many people","r":"**there are** a lot of people","n":"","s":true},{"id":"D1-1","v":"Nhà tôi có 4 người","w":"my house has 4 people","r":"**there are** four people in my family","n":"","s":true},{"id":"D1-2","v":"Trong phòng có một cái bàn","w":"in the room has a table","r":"**there's** a table in the room","n":"","s":false},{"id":"D1-3","v":"Có vấn đề gì không?","w":"have problem?","r":"**Is there** a problem? / Is everything okay?","n":"","s":false},{"id":"D1-4","v":"Có ai ở đó không?","w":"have anyone there?","r":"**Is anyone** there?","n":"","s":false},{"id":"D1-5","v":"Gần đây có quán cà phê không?","w":"near here have café?","r":"**Is there** a café near here?","n":"","s":false},{"id":"D1-6","v":"Không có gì để ăn","w":"don't have anything eat","r":"**There's nothing** to eat","n":"","s":false},{"id":"D1-7","v":"Hôm nay có họp không?","w":"today have meeting?","r":"**Do we have** a meeting today?","n":"\"we\" sở hữu cuộc họp nên dùng have","s":false}]},{"id":"D2","title":"Liên từ đôi: chỉ dùng một","why":"Tiếng Việt nói theo cặp \"tuy… nhưng\", \"vì… nên\". Tiếng Anh chỉ dùng một trong hai.","hook":"Một câu chỉ có **một** từ nối: **although** hoặc **but** · **because** hoặc **so**.","items":[{"id":"D2-0","v":"Tuy trời mưa nhưng chúng tôi vẫn đi","w":"Although it rained, but we still went","r":"**Although** it rained, we still went / It rained, **but** we still went","n":"","s":true},{"id":"D2-1","v":"Vì mệt nên tôi đi ngủ","w":"Because I was tired, so I slept","r":"**Because** I was tired, I went to bed / I was tired, **so** I went to bed","n":"","s":true},{"id":"D2-2","v":"Mặc dù bận nhưng anh ấy vẫn giúp","w":"Even though he was busy, but he helped","r":"**Even though** he was busy, he helped","n":"","s":false},{"id":"D2-3","v":"Tuy đắt nhưng tôi vẫn mua","w":"Although expensive, but I bought","r":"It was expensive, **but** I bought it anyway","n":"","s":false}]},{"id":"D3","title":"Thừa am / is / are","why":"Người Việt hay thêm \"am / is / are\" như chữ \"là\", kể cả khi câu đã có động từ.","hook":"Câu đã có động từ hành động (work, like, agree, know, live…) thì **không** thêm am / is / are. Phủ định và câu hỏi dùng **do / does / did**.","items":[{"id":"D3-0","v":"Tôi đồng ý","w":"I'm agree","r":"I **agree**","n":"","s":true},{"id":"D3-1","v":"Tôi làm việc ở ngân hàng","w":"I am work at a bank","r":"I **work** at a bank","n":"","s":false},{"id":"D3-2","v":"Tôi không hiểu","w":"I'm not understand","r":"I **don't** understand","n":"","s":false},{"id":"D3-3","v":"Tôi không biết","w":"I'm not know","r":"I **don't** know","n":"","s":false},{"id":"D3-4","v":"Bạn có thích cà phê không?","w":"Are you like coffee?","r":"**Do** you like coffee?","n":"","s":false},{"id":"D3-5","v":"Anh ấy sống ở Hà Nội","w":"He is live in Hanoi","r":"He **lives** in Hanoi","n":"","s":false},{"id":"D3-6","v":"Tôi thường dậy lúc 6 giờ","w":"I'm usually get up at 6","r":"I usually **get up** at 6","n":"","s":false},{"id":"D3-7","v":"Hôm qua cô ấy không đến","w":"Yesterday she is not come","r":"She **didn't come** yesterday","n":"","s":false}]},{"id":"D4","title":"Thì: đã, rồi, chưa, đang, sẽ","why":"Tiếng Việt thêm \"đã, rồi, chưa\" mà giữ nguyên động từ. Tiếng Anh phải đổi hình thức động từ.","hook":"Chuyện **đã xong** ở một thời điểm → quá khứ (went, ate, was). **Tính đến giờ** đã / chưa → **have + V3** (I've finished, I haven't eaten).","items":[{"id":"D4-0","v":"Hôm qua tôi đi siêu thị","w":"yesterday I go to the supermarket","r":"yesterday I **went** to the supermarket","n":"","s":true},{"id":"D4-1","v":"Hôm qua tôi bận","w":"yesterday I busy","r":"yesterday I **was** busy","n":"","s":false},{"id":"D4-2","v":"Tôi chưa ăn","w":"I not eat yet","r":"I **haven't eaten** yet","n":"","s":false},{"id":"D4-3","v":"Tôi làm xong rồi","w":"I finish already","r":"I'**ve finished** / I'm **done**","n":"","s":false},{"id":"D4-4","v":"Tôi hiểu rồi","w":"I understand already","r":"**Got it** / **I see**","n":"","s":false},{"id":"D4-5","v":"Tôi sống ở đây 5 năm rồi","w":"I live here 5 years","r":"I'**ve lived** here **for** 5 years","n":"","s":false},{"id":"D4-6","v":"Anh ấy đi làm rồi","w":"he go to work already","r":"he's **already left** for work","n":"","s":false},{"id":"D4-7","v":"Bạn đã bao giờ đi Nhật chưa?","w":"you already go Japan?","r":"**Have** you ever **been** to Japan?","n":"","s":false},{"id":"D4-8","v":"Tôi vừa mới về","w":"I just come back","r":"I **just got** back","n":"","s":false},{"id":"D4-9","v":"Tôi sẽ gọi lại cho bạn","w":"I will call again you","r":"I'**ll call** you **back**","n":"","s":false}]},{"id":"D5","title":"Số nhiều và danh từ không đếm được","why":"Tiếng Việt không đổi danh từ khi số nhiều. Tiếng Anh thêm -s, nhưng một số danh từ lại không bao giờ thêm -s.","hook":"Những từ này **không thêm -s** và **không đi với \"a\"**: information, advice, homework, feedback, news, money, furniture, equipment, luggage, traffic, knowledge.","items":[{"id":"D5-0","v":"Tôi có nhiều bạn","w":"I have many friend","r":"I have a lot of **friends**","n":"","s":true},{"id":"D5-1","v":"Hai năm","w":"two year","r":"two **years**","n":"","s":false},{"id":"D5-2","v":"Nhiều thông tin","w":"many informations","r":"a lot of **information**","n":"","s":true},{"id":"D5-3","v":"Một lời khuyên","w":"an advice","r":"**some advice** / **a piece of advice**","n":"","s":false},{"id":"D5-4","v":"Nhiều bài tập","w":"many homeworks","r":"a lot of **homework**","n":"","s":false},{"id":"D5-5","v":"Góp ý của bạn","w":"your feedbacks","r":"your **feedback**","n":"","s":false},{"id":"D5-6","v":"Có tin mới","w":"have a news","r":"I have **some news**","n":"","s":false},{"id":"D5-7","v":"Nhiều tiền","w":"many moneys","r":"a lot of **money**","n":"","s":false},{"id":"D5-8","v":"Đồ nội thất","w":"furnitures","r":"**furniture**","n":"","s":false},{"id":"D5-9","v":"Hành lý","w":"luggages","r":"**luggage** / my **bags**","n":"","s":false},{"id":"D5-10","v":"Thiết bị","w":"equipments","r":"**equipment**","n":"","s":false},{"id":"D5-11","v":"Tôi là kỹ sư","w":"I'm engineer","r":"I'm **an** engineer","n":"Nghề nghiệp phải có a / an","s":false}]},{"id":"D6","title":"Câu hỏi","why":"Tiếng Việt hỏi bằng cách thêm \"không, đâu, gì\" vào cuối câu, không đổi trật tự. Tiếng Anh đưa trợ động từ (do, are, can…) lên trước chủ ngữ.","hook":"Từ để hỏi + **trợ động từ** + chủ ngữ + động từ: **Where are** you from? · **What do** you do? · **Can you** help me?","items":[{"id":"D6-0","v":"Bạn đến từ đâu?","w":"You are from where?","r":"**Where are** you from?","n":"","s":true},{"id":"D6-1","v":"Bạn làm nghề gì?","w":"What you do?","r":"**What do** you do?","n":"","s":false},{"id":"D6-2","v":"Bạn sống ở đâu?","w":"You live where?","r":"**Where do** you live?","n":"","s":false},{"id":"D6-3","v":"Sao bạn đến muộn?","w":"Why you late?","r":"**Why are** you late?","n":"","s":false},{"id":"D6-4","v":"Bạn giúp tôi được không?","w":"You can help me?","r":"**Can you** help me?","n":"","s":false},{"id":"D6-5","v":"Cái này tiếng Anh nói sao?","w":"This English say how?","r":"**How do you say** this in English?","n":"","s":false},{"id":"D6-6","v":"Bạn hiểu không?","w":"You understand?","r":"**Does that make sense?** / **Do** you understand?","n":"","s":false},{"id":"D6-7","v":"Mấy giờ rồi?","w":"What hour is it?","r":"**What time** is it?","n":"","s":false},{"id":"D6-8","v":"Bạn có rảnh không?","w":"You free or not?","r":"**Are you** free?","n":"","s":false},{"id":"D6-9","v":"Cái này bao nhiêu tiền?","w":"This how much?","r":"**How much is** this?","n":"","s":false},{"id":"D6-10","v":"Bạn có muốn đi không?","w":"You want go or not?","r":"**Do you want to** go?","n":"","s":false}]},{"id":"D7","title":"Từ thừa","why":"Tiếng Việt hay lặp ý để nhấn mạnh. Trong tiếng Anh, lặp ý nghe thừa và nhiều khi sai.","hook":"**return, repeat, better, best, perfect, excellent** đã đủ nghĩa, không thêm back, again, more, most, very.","items":[{"id":"D7-0","v":"Quay lại","w":"return back","r":"**return** / **come back**","n":"","s":false},{"id":"D7-1","v":"Nhắc lại lần nữa","w":"repeat again","r":"**repeat** that / say that **again**","n":"","s":false},{"id":"D7-2","v":"Tốt hơn nhiều","w":"more better","r":"**much better**","n":"","s":true},{"id":"D7-3","v":"Tốt nhất","w":"most best","r":"**the best**","n":"","s":false},{"id":"D7-4","v":"Hoàn hảo","w":"very perfect","r":"**perfect** / **absolutely perfect**","n":"","s":false},{"id":"D7-5","v":"Xuất sắc","w":"very excellent","r":"**excellent**","n":"","s":false},{"id":"D7-6","v":"Lý do là vì","w":"the reason is because","r":"**the reason is that**","n":"","s":false},{"id":"D7-7","v":"Giống như","w":"the same like","r":"the same **as**","n":"","s":false},{"id":"D7-8","v":"Cùng nhau hợp tác","w":"cooperate together","r":"**cooperate** / **work together**","n":"","s":false}]}]},{"id":"E","title":"Câu cửa miệng","intro":"Những câu người bản xứ nói theo thói quen. Dịch từ tiếng Việt sẽ ra câu khác hẳn, nên phải học nguyên câu như học một từ.","rules":[{"id":"E1","title":"Giao tiếp hằng ngày","why":"Đây là các câu dùng nhiều nhất trong nói chuyện thường ngày. Không phân tích ngữ pháp, chỉ cần học thuộc nguyên câu.","hook":"Học **nguyên câu** như học một từ. Mỗi ngày dùng thử 2–3 câu khi nhắn tin hoặc nói chuyện.","items":[{"id":"E1-0","v":"Tùy bạn","w":"follow you","r":"**It's up to you**","n":"","s":true},{"id":"E1-1","v":"Tôi đang đến","w":"I'm coming there","r":"**I'm on my way**","n":"","s":true},{"id":"E1-2","v":"Cứ từ từ","w":"slowly slowly","r":"**Take your time**","n":"","s":false},{"id":"E1-3","v":"Chờ tôi một chút","w":"wait me a little","r":"**Give me a minute** / **Hold on a sec**","n":"","s":false},{"id":"E1-4","v":"Xin lỗi tôi đến muộn","w":"Sorry I come late","r":"**Sorry I'm late**","n":"","s":false},{"id":"E1-5","v":"Tôi sắp trễ rồi","w":"I will late","r":"**I'm running late**","n":"","s":false},{"id":"E1-6","v":"Không sao đâu","w":"no what","r":"**No worries** / **It's okay**","n":"","s":false},{"id":"E1-7","v":"Không có gì (đáp lời cảm ơn)","w":"nothing","r":"**You're welcome** / **No problem**","n":"","s":false},{"id":"E1-8","v":"Tôi cũng vậy","w":"me same","r":"**Same here** / **Me too**","n":"","s":false},{"id":"E1-9","v":"Lỗi của tôi","w":"my error","r":"**My bad** / **That's my fault**","n":"","s":false},{"id":"E1-10","v":"Phiền bạn quá","w":"I disturb you","r":"**Sorry to bother you**","n":"","s":false},{"id":"E1-11","v":"Nhờ bạn một việc","w":"I trouble you something","r":"**Could you do me a favor?**","n":"","s":false},{"id":"E1-12","v":"Có gì cứ hỏi tôi","w":"have what just ask me","r":"**Feel free to ask me anything**","n":"","s":false},{"id":"E1-13","v":"Bạn hiểu ý tôi không?","w":"you understand my idea?","r":"**Do you know what I mean?**","n":"","s":false},{"id":"E1-14","v":"Tôi không biết nói sao","w":"I don't know say how","r":"**I'm not sure how to say it**","n":"","s":false},{"id":"E1-15","v":"Tiếng Anh tôi không giỏi","w":"my English not good","r":"**I'm not very good at English**","n":"","s":false},{"id":"E1-16","v":"Chúc một ngày tốt lành","w":"wish you good day","r":"**Have a nice day!**","n":"","s":false},{"id":"E1-17","v":"Tôi xin phép về trước","w":"I ask permission go home first","r":"**I've got to go** / **I'm heading out**","n":"","s":false},{"id":"E1-18","v":"Lâu rồi không gặp","w":"long time not meet","r":"**Long time no see**","n":"","s":false},{"id":"E1-19","v":"Chúc ngon miệng","w":"wish delicious","r":"**Enjoy your meal!**","n":"","s":false}]},{"id":"E2","title":"Công việc, văn phòng","why":"Tiếng Việt công sở có nhiều từ mượn và cách nói riêng. Dịch thẳng sẽ khiến email và cuộc họp nghe lạ.","hook":"Nếu bạn làm việc với người nước ngoài, đây là nhóm dùng hằng ngày. **Ưu tiên học nhóm này sớm.**","items":[{"id":"E2-0","v":"Làm việc chăm chỉ","w":"work hardly","r":"work **hard**","n":"\"hardly\" = hầu như không!","s":true},{"id":"E2-1","v":"Tăng ca","w":"increase shift","r":"**work overtime** / **work late**","n":"","s":false},{"id":"E2-2","v":"Nghỉ việc","w":"rest job","r":"**quit** my job / **leave** my job","n":"","s":false},{"id":"E2-3","v":"Đi công tác","w":"go work far","r":"go on a **business trip**","n":"","s":false},{"id":"E2-4","v":"Tôi đang họp","w":"I'm meeting","r":"I'm **in a meeting**","n":"","s":false},{"id":"E2-5","v":"Lương cao","w":"high money","r":"a **good salary** / I'm **well-paid**","n":"","s":false},{"id":"E2-6","v":"Deadline gấp","w":"urgent deadline","r":"a **tight** deadline","n":"","s":false},{"id":"E2-7","v":"Sếp khó tính","w":"boss difficult character","r":"my boss is really **strict** / **demanding**","n":"","s":false},{"id":"E2-8","v":"Nhờ bạn check giúp","w":"help me check","r":"**Could you take a look?**","n":"","s":true},{"id":"E2-9","v":"Tôi sẽ báo lại sau","w":"I will report later","r":"**I'll get back to you**","n":"","s":false},{"id":"E2-10","v":"Tôi gửi file cho bạn","w":"I send you file","r":"**I've attached the file** / **Here's the file**","n":"","s":false},{"id":"E2-11","v":"Tôi có việc bận đột xuất","w":"I have busy work","r":"**Something came up**","n":"","s":true},{"id":"E2-12","v":"Cập nhật cho tôi nhé","w":"update for me","r":"**Keep me posted**","n":"","s":false},{"id":"E2-13","v":"Tôi phụ trách dự án này","w":"I take charge this project","r":"**I'm in charge of** this project","n":"","s":false},{"id":"E2-14","v":"Cuộc họp bị hoãn","w":"meeting is delay","r":"the meeting's been **postponed** / **pushed back**","n":"","s":false},{"id":"E2-15","v":"Tôi xin nghỉ ốm","w":"I ask to rest sick","r":"**I'm calling in sick** / I need to **take a sick day**","n":"","s":false},{"id":"E2-16","v":"Làm việc từ xa","w":"work far","r":"**work remotely** / **work from home**","n":"","s":false},{"id":"E2-17","v":"Tôi đang dở tay","w":"I'm doing half","r":"**I'm in the middle of something**","n":"","s":false},{"id":"E2-18","v":"Xong rồi","w":"finish already","r":"**I'm done** / **It's done**","n":"","s":false},{"id":"E2-19","v":"Góp ý giúp tôi","w":"contribute ideas for me","r":"**Any feedback?** / **What do you think?**","n":"","s":false},{"id":"E2-20","v":"Đúng hạn","w":"correct deadline","r":"**on time** / **by the deadline**","n":"","s":false},{"id":"E2-21","v":"Tôi bận rồi (khi từ chối)","w":"I busy already","r":"**I'm tied up** / **I've got plans**","n":"","s":false}]}]},{"id":"F","title":"Bẫy văn hóa","intro":"Một số câu rất bình thường với người Việt nhưng lại kỳ hoặc bất lịch sự với người nước ngoài. Dịch đúng ngữ pháp vẫn có thể sai.","rules":[{"id":"F1","title":"Câu hỏi riêng tư và câu chào kiểu Việt","why":"Người Việt hỏi han để thể hiện quan tâm. Người phương Tây coi nhiều câu trong số đó là tọc mạch.","hook":"Với người mới quen, nói về **công việc, sở thích, cuối tuần, du lịch, đồ ăn**. Tránh **tuổi, lương, cân nặng, hôn nhân**.","items":[{"id":"F1-0","v":"Ăn cơm chưa? (để chào)","w":"Have you eaten rice yet?","r":"**How's it going?**","n":"Người nghe tưởng bạn mời ăn thật","s":false},{"id":"F1-1","v":"Bạn đi đâu đấy?","w":"Where are you going?","r":"**Going anywhere fun?**","n":"Chỉ hỏi khi đã thân, nếu không sẽ nghe như tọc mạch","s":false},{"id":"F1-2","v":"Bạn bao nhiêu tuổi? (người mới quen)","w":"How old are you?","r":"**What do you do?**","n":"Hỏi tuổi người lớn mới quen là bất lịch sự, hãy hỏi công việc","s":false},{"id":"F1-3","v":"Lương bạn bao nhiêu?","w":"How much is your salary?","r":"**Do you enjoy your job?**","n":"Lương là chủ đề rất riêng tư","s":false},{"id":"F1-4","v":"Dạo này bạn béo lên","w":"You gained weight","r":"**You look great!**","n":"Nhận xét cân nặng là bất lịch sự","s":false},{"id":"F1-5","v":"Bạn có gia đình chưa?","w":"Do you have family yet?","r":"Đợi người kia tự kể","n":"\"have a family\" còn có nghĩa là đã có con","s":false},{"id":"F1-6","v":"Sao chưa lấy vợ / chồng?","w":"Why aren't you married?","r":"Không hỏi","n":"Chủ đề rất riêng tư","s":false},{"id":"F1-7","v":"Ăn nhiều vào nhé! (khi mời)","w":"Eat a lot!","r":"**Help yourself!**","n":"\"Eat a lot\" nghe như ra lệnh","s":false}]}]}];
+
+const PARTS = DATA;
+const RULES = PARTS.flatMap(p => p.rules.map(r => Object.assign({}, r, { part: p.id })));
+const ITEMS = RULES.flatMap(r => r.items.map(it => Object.assign({}, it, { rule: r.id, ruleTitle: r.title, hook: r.hook, part: r.part })));
+const BY_ID = Object.fromEntries(ITEMS.map(it => [it.id, it]));
+
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+const plain = s => String(s).replace(/\*\*/g, '');
+const norm = s => plain(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+
+/* Storage */
+const KEY = 'bdva-progress-v1', PREF = 'bdva-prefs-v1';
+function load(k, fb) { try { const v = JSON.parse(localStorage.getItem(k)); return v && typeof v === 'object' ? v : fb; } catch (e) { return fb; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+let prog = load(KEY, {});
+let prefs = Object.assign({ tab: 'cards', scope: 'all', onlyNew: false }, load(PREF, {}));
+const lvl = id => prog[id] || 0;
+function setLvl(id, v) { prog[id] = v; save(KEY, prog); updateProgress(); }
+function savePrefs() { save(PREF, prefs); }
+
+/* Speech */
+const canSpeak = 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
+if (!canSpeak) document.documentElement.classList.add('no-speech');
+function speak(text) {
+  if (!canSpeak) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(plain(text).replace(/ \/ /g, ', or '));
+    u.lang = 'en-US'; u.rate = 0.9;
+    const vs = speechSynthesis.getVoices();
+    const v = vs.find(x => /^en[-_]US/i.test(x.lang)) || vs.find(x => /^en/i.test(x.lang));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+if (canSpeak) { try { speechSynthesis.getVoices(); } catch (e) {} }
+$$('.speak').forEach(b => { b.innerHTML = ICON; });
+
+/* Scope */
+function inScope(it) {
+  const s = prefs.scope;
+  if (s === 'star') return it.s;
+  if (s.startsWith('p:')) return it.part === s.slice(2);
+  if (s.startsWith('r:')) return it.rule === s.slice(2);
+  return true;
+}
+function pool(quiz) { return ITEMS.filter(it => inScope(it) && (!prefs.onlyNew || lvl(it.id) < 2) && (!quiz || it.part !== 'F')); }
+
+function buildScope() {
+  const starCount = ITEMS.filter(i => i.s).length;
+  $('#scope').innerHTML =
+    `<option value="all">Tất cả (${ITEMS.length} cụm)</option>` +
+    `<option value="star">Hay gặp nhất, học trước (${starCount} cụm)</option>` +
+    `<optgroup label="Theo phần">${PARTS.map(p => `<option value="p:${p.id}">Phần ${p.id}. ${esc(p.title)}</option>`).join('')}</optgroup>` +
+    `<optgroup label="Theo quy luật">${RULES.map(r => `<option value="r:${r.id}">${r.id}. ${esc(r.title)} (${r.items.length})</option>`).join('')}</optgroup>`;
+  const valid = $$('#scope option').some(o => o.value === prefs.scope);
+  if (!valid) prefs.scope = 'all';
+  $('#scope').value = prefs.scope;
+  $('#onlyNew').checked = !!prefs.onlyNew;
+}
+
+function updateProgress() {
+  const known = ITEMS.filter(i => lvl(i.id) === 2).length;
+  $('#pfill').style.width = (known / ITEMS.length * 100) + '%';
+  $('#ptext').textContent = `Đã nhớ ${known} / ${ITEMS.length}`;
+  const sc = ITEMS.filter(inScope);
+  const k2 = sc.filter(i => lvl(i.id) === 2).length;
+  $('#scopeInfo').textContent = `Học phần này: đã nhớ ${k2} / ${sc.length} cụm`;
+}
+
+/* Tabs */
+function showTab(tab) {
+  prefs.tab = tab; savePrefs();
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === tab)));
+  $('#p-cards').hidden = tab !== 'cards';
+  $('#p-quiz').hidden = tab !== 'quiz';
+  $('#p-browse').hidden = tab !== 'browse';
+}
+$$('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
+
+/* Cards */
+let deck = [], di = 0, flipped = false, sess = { known: 0, againIds: new Set() };
+function newDeck(ids) {
+  const p = ids ? ITEMS.filter(i => ids.has(i.id)) : pool(false);
+  const fresh = shuffle(p.filter(i => lvl(i.id) === 1)).concat(shuffle(p.filter(i => lvl(i.id) === 0)));
+  const known = shuffle(p.filter(i => lvl(i.id) === 2));
+  deck = fresh.concat(known).slice(0, 20);
+  di = 0; sess = { known: 0, againIds: new Set() };
+  renderCard();
+}
+function renderCard() {
+  const empty = deck.length === 0;
+  $('#cardEmpty').hidden = !empty;
+  if (empty) { $('#cardWrap').hidden = true; $('#cardDone').hidden = true; return; }
+  if (di >= deck.length) {
+    $('#cardWrap').hidden = true; $('#cardDone').hidden = false;
+    const left = [...sess.againIds].filter(id => lvl(id) < 2);
+    $('#dKnown').textContent = sess.known;
+    $('#dAgain').textContent = left.length;
+    $('#bReview').hidden = left.length === 0;
+    return;
+  }
+  const it = deck[di];
+  flipped = false;
+  $('#cardWrap').hidden = false; $('#cardDone').hidden = true;
+  $('#card').classList.remove('flipped');
+  $('#card').setAttribute('aria-label', 'Lật thẻ');
+  $('#cStar').hidden = !it.s;
+  $('#cRule').textContent = `${it.rule}. ${it.ruleTitle}`;
+  $('#cCount').textContent = `Thẻ ${di + 1} / ${deck.length}`;
+  $('#cVn').textContent = it.v;
+  $('#cRight').innerHTML = rich(it.r);
+  $('#cWrong').textContent = it.w;
+  $('#cNote').textContent = it.n;
+  $('#cNote').hidden = !it.n;
+  $('#cHook').innerHTML = '<b>Mẹo nhớ:</b> ' + rich(it.hook);
+  $('#cBack').hidden = true; $('#cHint').hidden = false;
+  $('#cFlipRow').hidden = false; $('#cGrade').hidden = true;
+  $('#deckFill').style.width = (di / deck.length * 100) + '%';
+}
+function flip() {
+  if (flipped || di >= deck.length) return;
+  flipped = true;
+  $('#card').classList.add('flipped');
+  $('#card').removeAttribute('aria-label');
+  $('#cBack').hidden = false; $('#cHint').hidden = true;
+  $('#cFlipRow').hidden = true; $('#cGrade').hidden = false;
+  $('#bKnow').focus({ preventScroll: true });
+}
+function grade(ok) {
+  if (!flipped) return;
+  const it = deck[di];
+  if (ok) { setLvl(it.id, 2); sess.known++; }
+  else {
+    setLvl(it.id, 1); sess.againIds.add(it.id);
+    deck.splice(Math.min(deck.length, di + 4), 0, it);
+  }
+  di++;
+  renderCard();
+}
+$('#card').addEventListener('click', e => { if (!e.target.closest('button')) flip(); });
+$('#bFlip').addEventListener('click', flip);
+$('#bAgain').addEventListener('click', () => grade(false));
+$('#bKnow').addEventListener('click', () => grade(true));
+$('#cSpeak').addEventListener('click', () => { if (deck[di]) speak(deck[di].r); });
+$('#bNewDeck').addEventListener('click', () => newDeck());
+$('#bReview').addEventListener('click', () => newDeck(new Set([...sess.againIds].filter(id => lvl(id) < 2))));
+
+/* Quiz */
+let q = null, qDone = false, last = null, qs = { right: 0, total: 0, streak: 0 };
+function nextQuiz() {
+  const p = pool(true);
+  $('#quizEmpty').hidden = p.length > 0;
+  $('#quizBox').hidden = p.length === 0;
+  if (!p.length) return;
+  let it, g = 0;
+  do { it = p[Math.floor(Math.random() * p.length)]; g++; } while (p.length > 1 && it === last && g < 20);
+  last = it; qDone = false;
+  q = { it, opts: shuffle([{ t: it.r, ok: true }, { t: it.w, ok: false }]) };
+  $('#qRule').textContent = `${it.rule}. ${it.ruleTitle}`;
+  $('#qVn').textContent = it.v;
+  $('#qOpts').innerHTML = q.opts.map((o, i) => `<button class="opt" type="button" data-i="${i}"><kbd>${i + 1}</kbd><span>${esc(plain(o.t))}</span></button>`).join('');
+  $('#qFb').hidden = true; $('#qNextRow').hidden = true;
+}
+function answer(i) {
+  if (qDone || !q) return;
+  qDone = true;
+  const o = q.opts[i], it = q.it;
+  qs.total++;
+  if (o.ok) { qs.right++; qs.streak++; } else { qs.streak = 0; setLvl(it.id, 1); }
+  $$('#qOpts .opt').forEach((b, k) => {
+    b.disabled = true;
+    if (q.opts[k].ok) b.classList.add('good');
+    else if (k === i) b.classList.add('bad');
+  });
+  $('#qFb').innerHTML =
+    `<p class="fb-title ${o.ok ? 'good' : 'bad'}">${o.ok ? 'Chính xác!' : 'Chưa đúng.'}</p>` +
+    `<p>Người bản xứ nói: <b>${esc(plain(it.r))}</b></p>` +
+    (it.n ? `<p class="note">${esc(it.n)}</p>` : '') +
+    `<p class="hook"><b>Mẹo nhớ:</b> ${rich(it.hook)}</p>`;
+  $('#qFb').hidden = false; $('#qNextRow').hidden = false;
+  $('#qScore').textContent = `Đúng ${qs.right} / ${qs.total}` + (qs.streak > 1 ? ` · chuỗi ${qs.streak}` : '');
+  $('#qNext').focus({ preventScroll: true });
+}
+$('#qOpts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b) answer(+b.dataset.i); });
+$('#qNext').addEventListener('click', nextQuiz);
+
+/* Browse */
+function renderBrowse() {
+  const term = norm($('#q').value.trim());
+  const list = pool(false).filter(it => !term || norm(`${it.v} ${it.w} ${it.r} ${it.n}`).includes(term));
+  $('#bCount').textContent = list.length ? `${list.length} cụm` : 'Không tìm thấy cụm nào. Thử từ khóa khác hoặc đổi học phần.';
+  const html = [];
+  for (const r of RULES) {
+    const rows = list.filter(it => it.rule === r.id);
+    if (!rows.length) continue;
+    html.push(`<div class="group"><h3><small>${r.id}</small>${esc(r.title)}</h3><p class="ghook">${rich(r.hook)}</p><ul class="rows">` +
+      rows.map(it => `<li class="row">
+        <span class="dot l${lvl(it.id)}" title="${['Chưa học', 'Đang học', 'Đã nhớ'][lvl(it.id)]}"></span>
+        <p class="r-vn">${it.s ? '<span class="pill">Hay gặp</span>' : ''}${esc(it.v)}</p>
+        <p class="r-wrong">${esc(it.w)}</p>
+        <p class="r-right">${rich(it.r)}${it.n ? `<span class="r-note">${esc(it.n)}</span>` : ''}</p>
+        <button class="btn icon-btn speak" type="button" data-say="${it.id}" aria-label="Nghe phát âm">${ICON}</button>
+      </li>`).join('') + `</ul></div>`);
+  }
+  $('#bList').innerHTML = html.join('');
+}
+$('#q').addEventListener('input', renderBrowse);
+$('#bList').addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b && BY_ID[b.dataset.say]) speak(BY_ID[b.dataset.say].r); });
+
+/* Filters */
+function refreshAll() { updateProgress(); newDeck(); nextQuiz(); renderBrowse(); }
+$('#scope').addEventListener('change', () => { prefs.scope = $('#scope').value; savePrefs(); refreshAll(); });
+$('#onlyNew').addEventListener('change', () => { prefs.onlyNew = $('#onlyNew').checked; savePrefs(); refreshAll(); });
+
+/* Reset (two-step, in page) */
+let resetArmed = null;
+$('#bReset').addEventListener('click', () => {
+  const b = $('#bReset');
+  if (!resetArmed) {
+    b.textContent = 'Bấm lần nữa để xóa toàn bộ tiến độ';
+    resetArmed = setTimeout(() => { resetArmed = null; b.textContent = 'Xóa tiến độ'; }, 4000);
+    return;
+  }
+  clearTimeout(resetArmed); resetArmed = null;
+  prog = {}; save(KEY, prog);
+  b.textContent = 'Đã xóa tiến độ';
+  setTimeout(() => { b.textContent = 'Xóa tiến độ'; }, 2500);
+  refreshAll();
+});
+
+/* Keyboard */
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.target.closest('input, select, textarea')) return;
+  if (e.target.closest('button') && (e.key === 'Enter' || e.key === ' ')) return;
+  if (prefs.tab === 'cards' && !$('#cardWrap').hidden) {
+    if (!flipped && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); flip(); }
+    else if (flipped && e.key === '1') grade(false);
+    else if (flipped && e.key === '2') grade(true);
+  } else if (prefs.tab === 'quiz' && !$('#quizBox').hidden) {
+    if (!qDone && (e.key === '1' || e.key === '2')) answer(+e.key - 1);
+    else if (qDone && e.key === 'Enter') { e.preventDefault(); nextQuiz(); }
+  }
+});
+
+/* Init */
+$('#eyebrow').textContent = `Tiếng Anh tự nhiên · ${ITEMS.length} cụm · ${RULES.length} quy luật`;
+buildScope();
+savePrefs();
+refreshAll();
+showTab(['cards', 'quiz', 'browse'].includes(prefs.tab) ? prefs.tab : 'cards');
+</script>
+</body>
+</html>

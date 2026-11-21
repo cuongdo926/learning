@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Khung Câu Phản Xạ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&display=swap">
+<style>
+/* Layout: study sheet. Map of 8 types -> one frame at a time (steps | context) -> shared kit -> timed random drill */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --sunk:#E8ECF3; --ink:#141B2D; --muted:#566178; --line:#D8DEE8;
+  --accent:#2445C8; --accent-soft:#E2E8FF; --on-accent:#FFFFFF; --knob:#FFFFFF;
+  --hl:#FFE36E; --hl-ink:#141B2D; --warn:#C2410C;
+  --font-display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --font-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D121B; --surface:#151C29; --sunk:#1C2534; --ink:#E6EAF2; --muted:#9AA4B7; --line:#273145;
+    --accent:#8AA4FF; --accent-soft:#1E2A4A; --on-accent:#0D121B; --knob:#E6EAF2;
+    --hl:rgba(255,214,77,.22); --hl-ink:#FFE79A; --warn:#FB923C;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D121B; --surface:#151C29; --sunk:#1C2534; --ink:#E6EAF2; --muted:#9AA4B7; --line:#273145;
+  --accent:#8AA4FF; --accent-soft:#1E2A4A; --on-accent:#0D121B; --knob:#E6EAF2;
+  --hl:rgba(255,214,77,.22); --hl-ink:#FFE79A; --warn:#FB923C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{text-wrap:balance}
+.en{font-weight:600}
+.muted{color:var(--muted)}
+
+/* Intro */
+.intro{padding-block:40px 28px}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0}
+h1{font-size:clamp(2.1rem,5.5vw,3.2rem);line-height:1.08;margin:.2em 0 .35em;font-weight:800;letter-spacing:-.02em}
+.lede{max-width:62ch;color:var(--muted);font-size:1.0625rem;margin:0}
+.how{display:flex;flex-wrap:wrap;gap:8px 10px;margin:22px 0 0;padding:0;list-style:none}
+.how li{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 16px 5px 5px;font-weight:500;font-size:15px}
+.how b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:13px;font-family:var(--font-display)}
+
+/* Sticky nav */
+.topnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);border-block:1px solid var(--line)}
+.topnav .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:8px;scrollbar-width:none}
+.topnav .wrap::-webkit-scrollbar{display:none}
+.topnav a{white-space:nowrap;padding:6px 12px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:600;font-size:14px}
+.topnav a:hover{background:var(--sunk);color:var(--ink)}
+
+/* Sections */
+section{padding-block:40px;scroll-margin-top:60px;border-top:1px solid var(--line)}
+main > section:first-child{border-top:0}
+.sec-head{margin-bottom:22px}
+.sec-head h2{font-size:clamp(1.45rem,3vw,1.8rem);margin:0 0 6px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.sec-head p{margin:0;color:var(--muted);max-width:66ch}
+
+/* Inline marks */
+mark{background:var(--hl);color:var(--hl-ink);padding:.04em .22em;border-radius:3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.slot{display:inline-block;min-width:1.9em;height:1em;border-bottom:2px dashed var(--accent);vertical-align:-.12em;margin:0 .12em}
+.opt{color:var(--accent);font-weight:600}
+
+/* Map */
+.map{display:grid;gap:8px}
+.map-head,.map-row{display:grid;grid-template-columns:40px minmax(0,1.15fr) minmax(0,1.2fr) minmax(0,1.25fr);gap:18px;align-items:center}
+.map-head{padding:0 18px 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.map-row{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 18px;cursor:pointer;color:inherit;font:inherit;transition:border-color .15s}
+.map-row:hover{border-color:var(--accent)}
+.num{font-family:var(--font-display);font-weight:800;font-size:1.6rem;line-height:1;color:var(--accent)}
+.mcues{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.cue{font-size:13px;padding:2px 8px;border-radius:6px;background:var(--sunk);font-weight:600}
+.cue .slot{min-width:1.1em}
+.mtype .en{font-family:var(--font-display);font-weight:700;font-size:1.05rem}
+.mtype small{display:block;color:var(--muted);font-size:13px;font-weight:500}
+.mopen{font-weight:600;font-size:15px}
+@media (max-width:760px){
+  .map-head{display:none}
+  .map-row{grid-template-columns:30px minmax(0,1fr);gap:6px 12px;align-items:start}
+  .map-row .num{grid-column:1;grid-row:1 / span 3;padding-top:2px}
+  .mtype,.mcues,.mopen{grid-column:2}
+  .mtype{order:1}.mcues{order:2}.mopen{order:3}
+  .mcues::before{content:"Nghe thấy:";font-size:13px;color:var(--muted);margin-right:2px}
+  .mopen::before{content:"Mở đầu: ";color:var(--muted);font-weight:400;font-size:13px}
+}
+
+/* Frame picker */
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px 6px 10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:flex;gap:8px;align-items:center}
+.chip b{font-family:var(--font-display);color:var(--accent)}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-pressed="true"] b{color:inherit}
+.frame-tools{display:flex;justify-content:space-between;align-items:center;gap:12px 20px;flex-wrap:wrap;margin:16px 0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);align-items:center}
+.legend > span{display:inline-flex;align-items:center;gap:6px}
+.switch{position:relative;display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:14px;cursor:pointer;user-select:none}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.track{width:40px;height:22px;border-radius:99px;background:var(--line);position:relative;transition:background .2s;flex:none}
+.track::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--knob);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s}
+.switch input:checked + .track{background:var(--accent)}
+.switch input:checked + .track::after{transform:translateX(18px);background:var(--on-accent)}
+.switch input:focus-visible + .track{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Frame card */
+.frame{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,3vw,32px)}
+.frame-head{display:flex;gap:18px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px}
+.frame-num{font-family:var(--font-display);font-size:3.2rem;line-height:.9;font-weight:800;color:var(--accent);flex:none}
+.frame-q{font-family:var(--font-display);font-size:clamp(1.45rem,3.6vw,2.15rem);font-weight:700;line-height:1.15;margin:0}
+.frame-name{color:var(--muted);margin:4px 0 0;font-weight:500}
+.frame-body{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:36px}
+@media (max-width:860px){.frame-body{grid-template-columns:minmax(0,1fr);gap:28px}}
+.steps{list-style:none;margin:0;padding:0}
+.step{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;position:relative;padding-bottom:22px}
+.step::before{content:"";position:absolute;left:15px;top:36px;bottom:4px;width:2px;background:var(--line)}
+.step:last-child{padding-bottom:0}
+.step:last-child::before{display:none}
+.step-n{width:32px;height:32px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-weight:800;font-family:var(--font-display);background:var(--surface)}
+.step-label{font-weight:700;margin:3px 0 6px;font-size:16px}
+.step-label span{font-weight:400;color:var(--muted);font-size:14px}
+.vars{list-style:none;margin:0;padding:0;display:grid;gap:1px}
+.vars li{display:flex;flex-wrap:wrap;gap:0 14px;align-items:baseline;justify-content:space-between;padding:6px 10px;border-radius:8px}
+.vars li:hover{background:var(--sunk)}
+.has-speech .vars li[data-say]{cursor:pointer}
+.vars .vi{color:var(--muted);font-size:14px}
+.side{display:grid;gap:22px;align-content:start}
+.side h4,.label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:700}
+.asks{display:flex;flex-wrap:wrap;gap:6px}
+.ask{background:var(--accent-soft);border-radius:8px;padding:4px 10px;font-size:14px;font-weight:600}
+.example{background:var(--sunk);border-radius:12px;padding:16px 18px}
+.ex-q{font-weight:700;margin:0 0 8px;display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.ex-a{margin:0;line-height:1.8}
+.tip p{margin:0;font-size:15px}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:16px}
+
+/* Quiz mode */
+.quiz .reveal{position:relative;cursor:pointer;border-radius:10px}
+.quiz .reveal:not(.shown) > *{filter:blur(6px);opacity:.5;user-select:none}
+.quiz .reveal:not(.shown)::after{content:"Bấm để xem";position:absolute;inset:0;display:grid;place-items:center;font-weight:700;font-size:14px;color:var(--accent)}
+
+/* Buttons */
+.btn{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:9px 16px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .15s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.4;cursor:default;border-color:var(--line)}
+.icon-btn{width:36px;height:36px;padding:0;justify-content:center;flex:none;color:var(--accent)}
+.no-speech .speak,.no-speech .speech-only{display:none}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* Kit */
+.callout{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:18px}
+.callout .label{margin:0}
+.callout .en{font-size:1.05rem}
+.kit{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.kit{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.kit{grid-template-columns:minmax(0,1fr)}}
+.kit-group{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 10px 10px}
+.kit-group h3{font-size:15px;margin:0 10px 6px;font-weight:700}
+.kit-group .vars li{flex-direction:column;gap:0}
+
+/* Drill */
+.drill{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.drill{grid-template-columns:minmax(0,1fr)}}
+.drill-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,3vw,30px);display:grid;gap:18px;align-content:start}
+.drill-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.drill-top label{font-size:14px;font-weight:600}
+.drill-top #dcount{margin-left:auto;font-size:14px;font-variant-numeric:tabular-nums}
+select{font:inherit;font-size:14px;font-weight:500;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;max-width:100%}
+.dq-row{display:flex;gap:12px;align-items:flex-start}
+.dq{flex:1;min-width:0;font-family:var(--font-display);font-size:clamp(1.6rem,4.2vw,2.5rem);line-height:1.15;font-weight:700;margin:0}
+.timer{display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.bar span{display:block;height:100%;width:100%;background:var(--accent);border-radius:inherit;transition:width .1s linear}
+.timer.low .bar span{background:var(--warn)}
+.timer.low #dsec,.timer.done #dsec{color:var(--warn)}
+#dsec{font-variant-numeric:tabular-nums;font-weight:700;min-width:5em;text-align:right;font-size:15px}
+.drill-actions{display:flex;flex-wrap:wrap;gap:8px}
+.hintbox{border-top:1px dashed var(--line);padding-top:16px}
+.hint-type{margin:0;font-weight:600}
+.hint-type .en{font-family:var(--font-display)}
+.hint-steps{list-style:none;margin:10px 0 12px;padding:0;display:grid;gap:6px}
+.hint-steps li{display:flex;gap:10px;align-items:flex-start}
+.hn{flex:none;width:22px;height:22px;margin-top:2px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:12px;font-weight:800}
+.hint-steps b{font-weight:600;color:var(--muted);margin-right:6px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;align-self:start}
+.plan h3{margin:0 0 12px;font-size:1.05rem}
+.plan ol{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:12px}
+.plan li{font-size:15px}
+.plan li b{display:block;font-size:13px;color:var(--accent)}
+.plan p{margin:0;font-size:14px;color:var(--muted)}
+.foot{padding-block:8px 40px;color:var(--muted);font-size:13px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;scroll-behavior:auto !important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="intro">
+    <p class="eyebrow">Tiếng Anh giao tiếp · 8 dạng câu hỏi</p>
+    <h1>Khung Câu Phản Xạ</h1>
+    <p class="lede">Hầu hết câu hỏi khi nói chuyện chỉ thuộc 8 dạng, và mỗi dạng có một khung trả lời. Thuộc khung rồi thay nội dung của bạn vào, bạn sẽ nói được dài với câu hỏi bất kỳ mà không phải dịch từ tiếng Việt.</p>
+    <ol class="how">
+      <li><b>1</b>Nghe từ khóa trong câu hỏi</li>
+      <li><b>2</b>Nhận ra đó là dạng nào</li>
+      <li><b>3</b>Lắp khung, điền nội dung của bạn</li>
+    </ol>
+  </header>
+</div>
+
+<nav class="topnav" aria-label="Mục lục">
+  <div class="wrap">
+    <a href="#map">Bản đồ nhận dạng</a>
+    <a href="#frames">Học từng khung</a>
+    <a href="#kit">Đồ nghề chung</a>
+    <a href="#drill">Luyện ngẫu nhiên</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section id="map">
+    <div class="sec-head">
+      <h2>Bản đồ nhận dạng</h2>
+      <p>Nghe thấy từ khóa ở cột đầu là biết ngay dạng câu hỏi và câu mở đầu. Bấm vào một dòng để mở khung đầy đủ.</p>
+    </div>
+    <div class="map-head" aria-hidden="true"><span></span><span>Nghe thấy</span><span>Dạng câu hỏi</span><span>Mở đầu bằng</span></div>
+    <div class="map" id="mapList"></div>
+  </section>
+
+  <section id="frames">
+    <div class="sec-head">
+      <h2>Học từng khung</h2>
+      <p>Đi lần lượt từng bước, mỗi bước chọn một biến thể bạn thấy dễ nói nhất. Học thuộc phần tô vàng, phần còn lại là nội dung của bạn.<span class="speech-only"> Bấm vào câu tiếng Anh để nghe phát âm.</span></p>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Chọn dạng câu hỏi"></div>
+    <div class="frame-tools">
+      <div class="legend">
+        <span><mark>tô vàng</mark> phần khung</span>
+        <span><span class="slot"></span> chỗ bạn tự điền</span>
+        <span><span class="opt">chữ xanh</span> chọn một</span>
+      </div>
+      <label class="switch" for="quiz"><input type="checkbox" id="quiz"><span class="track"></span>Tự kiểm tra: che đáp án</label>
+    </div>
+    <article class="frame" id="frame" aria-live="polite"></article>
+    <div class="pager">
+      <button class="btn ghost" type="button" id="prev">← Dạng trước</button>
+      <button class="btn ghost" type="button" id="next">Dạng sau →</button>
+    </div>
+  </section>
+
+  <section id="kit">
+    <div class="sec-head">
+      <h2>Đồ nghề chung</h2>
+      <p>Những câu này dùng được trong mọi khung: để câu giờ khi đang nghĩ, để nói thêm, để cứu khi bí từ và để giữ cuộc nói chuyện đi tiếp.</p>
+    </div>
+    <div class="callout">
+      <span class="label">Bộ ba dùng ở hầu hết các khung</span>
+      <span class="en"><mark>because <span class="slot"></span></mark></span>
+      <span class="en"><mark>For example, <span class="slot"></span></mark></span>
+      <span class="en"><mark>What about you?</mark></span>
+    </div>
+    <div class="kit" id="kitGrid"></div>
+  </section>
+
+  <section id="drill">
+    <div class="sec-head">
+      <h2>Luyện ngẫu nhiên</h2>
+      <p>Đọc câu hỏi rồi trả lời to thành tiếng trong 30 giây. Đừng chuẩn bị trước, vấp thì cứ nói tiếp. Bí quá thì mở gợi ý khung.</p>
+    </div>
+    <div class="drill">
+      <div class="drill-card">
+        <div class="drill-top">
+          <label for="dtype">Luyện dạng</label>
+          <select id="dtype"></select>
+          <span id="dcount" class="muted">Câu 1</span>
+        </div>
+        <div class="dq-row">
+          <p class="dq" id="dq"></p>
+          <button class="btn icon-btn speak" type="button" id="dspeak" aria-label="Nghe câu hỏi"></button>
+        </div>
+        <div class="timer" id="timer"><div class="bar"><span id="dbar"></span></div><span id="dsec">30 giây</span></div>
+        <div class="drill-actions">
+          <button class="btn primary" type="button" id="dstart">Bắt đầu 30 giây</button>
+          <button class="btn" type="button" id="dnext">Câu khác</button>
+          <button class="btn ghost" type="button" id="dhint" aria-expanded="false" aria-controls="hintbox">Xem gợi ý khung</button>
+        </div>
+        <div class="hintbox" id="hintbox" hidden></div>
+      </div>
+      <aside class="plan">
+        <h3>Lịch luyện 3–4 tuần</h3>
+        <ol>
+          <li><b>Ngày 1 đến 8</b>Mỗi ngày một dạng. Chọn dạng ở ô "Luyện dạng" rồi trả lời 10 câu.</li>
+          <li><b>Ngày 9</b>Chọn "Trộn cả 8 dạng" và trả lời 15 câu.</li>
+          <li><b>Lặp lại</b>Làm 2–3 vòng như vậy. Đến vòng thứ ba, khung sẽ tự bật ra khi bạn nghe câu hỏi.</li>
+        </ol>
+        <p>Mỗi ngày ghi âm một câu trả lời và nghe lại. Gõ câu trả lời vào cuộc trò chuyện với Claude để được sửa lỗi và gợi ý cách nói tự nhiên hơn.</p>
+      </aside>
+    </div>
+  </section>
+</main>
+<footer class="wrap foot"><span class="speech-only">Phát âm dùng giọng đọc có sẵn trong trình duyệt của bạn, nên chất lượng giọng tùy theo thiết bị.</span></footer>
+
+<script>
+const FRAMES = [
+  { id:1, short:`Thích`, name:`Thích hay không thích`, q:`Do you like …?`,
+    cue:[`like`,`enjoy`,`into`,`a fan of`], opener:`Yes, I love it. / Not really.`,
+    asks:[`Do you like …?`,`Do you enjoy …?`,`Are you into …?`,`Are you a fan of …?`],
+    steps:[
+      {label:`Trả lời`, note:`có hay không, kèm mức độ`, items:[
+        [`Yes, I love it.`,`Rất thích`],[`Yes, I do.`,`Có, tôi thích`],[`It's okay. / Kind of.`,`Cũng được, tàm tạm`],
+        [`Not really.`,`Không thích lắm`],[`Not at all.`,`Hoàn toàn không`]]},
+      {label:`Lý do`, note:`vì sao`, items:[
+        [`I like it because …`,`Tôi thích vì…`],[`I don't like it because …`,`Tôi không thích vì…`],
+        [`The main reason is …`,`Lý do chính là…`],[`It's really [fun / relaxing / useful].`,`Nó rất [vui / thư giãn / hữu ích]`]]},
+      {label:`Ví dụ`, note:`thói quen hoặc một lần cụ thể`, items:[
+        [`For example, …`,`Ví dụ…`],[`I usually …`,`Tôi thường…`],[`Last week, I …`,`Tuần trước, tôi…`]]},
+      {label:`Hỏi lại`, note:`trả lượt cho người kia`, items:[
+        [`What about you?`,`Còn bạn thì sao?`],[`Do you like … too?`,`Bạn có thích… không?`]]}
+    ],
+    tip:`Đừng chỉ trả lời "Yes." Câu một chữ làm cuộc nói chuyện dừng lại. Ít nhất hãy nói thêm một câu có "because".`,
+    ex:{q:`Do you like coffee?`, a:`{{Yes, I love it.}} {{I like it because}} it helps me focus at work. {{For example,}} {{I usually}} drink a cup before I start coding. {{What about you?}}`}
+  },
+  { id:2, short:`Yêu thích nhất`, name:`Thứ yêu thích nhất`, q:`What's your favorite …?`,
+    cue:[`favorite`,`best`,`what kind of`], opener:`My favorite … is …`,
+    asks:[`What's your favorite …?`,`What kind of … do you like?`,`Which … do you like best?`,`Do you have a favorite …?`],
+    steps:[
+      {label:`Nêu tên`, note:`chọn một thứ`, items:[
+        [`My favorite … is …`,`… yêu thích của tôi là…`],[`I'd say …`,`Chắc là…`],[`It's hard to choose, but …`,`Khó chọn lắm, nhưng…`]]},
+      {label:`Giới thiệu`, note:`nó là gì`, items:[
+        [`It's a kind of …`,`Nó là một loại…`],[`It's from …`,`Nó đến từ…`],[`It's about …`,`Nó nói về… (phim, sách)`]]},
+      {label:`Lý do`, note:`thích ở điểm nào`, items:[
+        [`I like it because …`,`Tôi thích vì…`],[`What I like most is …`,`Điều tôi thích nhất là…`]]},
+      {label:`Khi nào`, note:`thói quen gắn với nó`, items:[
+        [`I usually … it when …`,`Tôi thường… nó khi…`],[`I first tried it when …`,`Lần đầu tôi thử là khi…`]]},
+      {label:`Hỏi lại`, items:[
+        [`What's yours?`,`Còn của bạn là gì?`],[`Have you ever tried it?`,`Bạn thử bao giờ chưa?`]]}
+    ],
+    tip:`Chưa nghĩ ra ngay thì mở bằng "It's hard to choose, but…". Câu này nghe tự nhiên và cho bạn thêm vài giây để nghĩ.`,
+    ex:{q:`What's your favorite food?`, a:`{{It's hard to choose, but}} {{I'd say}} phở. {{It's a kind of}} Vietnamese noodle soup. {{What I like most is}} the hot broth. {{I usually}} eat {{it when}} the weather is cold. {{Have you ever tried it?}}`}
+  },
+  { id:3, short:`Tần suất`, name:`Mức độ thường xuyên`, q:`How often do you …?`,
+    cue:[`how often`,`a lot`,`how much time`,`the last time`], opener:`About twice a week.`,
+    asks:[`How often do you …?`,`Do you … a lot?`,`Do you often …?`,`How much time do you spend …?`,`When was the last time you …?`],
+    steps:[
+      {label:`Tần suất`, note:`từ nhiều đến ít`, items:[
+        [`Every day. / Almost every day.`,`Hằng ngày / Gần như hằng ngày`],[`About [once / twice / three times] a week.`,`Khoảng [1 / 2 / 3] lần một tuần`],
+        [`Quite often. / Sometimes.`,`Khá thường xuyên / Thỉnh thoảng`],[`Not very often. / Hardly ever.`,`Không thường lắm / Hầu như không`]]},
+      {label:`Khi nào, với ai`, note:`bối cảnh quen thuộc`, items:[
+        [`Usually in the [morning / evening].`,`Thường vào [buổi sáng / buổi tối]`],[`Usually with …`,`Thường đi cùng…`],[`Usually at …`,`Thường ở…`]]},
+      {label:`Lần gần nhất`, items:[
+        [`The last time was …`,`Lần gần nhất là…`],[`Last [weekend / month], I …`,`[Cuối tuần / Tháng] trước, tôi…`]]},
+      {label:`Thay đổi`, note:`không bắt buộc`, items:[
+        [`But recently, I've been … more.`,`Nhưng gần đây tôi… nhiều hơn`],[`I want to do it more often.`,`Tôi muốn làm thường xuyên hơn`]]},
+      {label:`Hỏi lại`, items:[[`How about you?`,`Còn bạn thì sao?`]]}
+    ],
+    tip:`"Twice a week" tự nhiên hơn "two times a week". Từ 3 lần trở lên mới dùng "times": three times, four times.`,
+    ex:{q:`How often do you exercise?`, a:`{{Not very often}}, to be honest. Maybe {{once a week}}. {{Usually with}} my friends on Sunday morning. {{The last time was}} two weeks ago. {{I want to do it more often}}, but I'm always busy. {{How about you?}}`}
+  },
+  { id:4, short:`Miêu tả`, name:`Miêu tả người, nơi, vật`, q:`Tell me about your …`,
+    cue:[`describe`,`tell me about`,`what's … like`,`look like`], opener:`It's a [small / big] …`,
+    asks:[`Tell me about your …`,`Can you describe …?`,`What's … like?`,`What does … look like?`],
+    steps:[
+      {label:`Giới thiệu chung`, items:[
+        [`It's a [small / big / quiet] …`,`Đó là một… [nhỏ / lớn / yên tĩnh]`],[`He's / She's my …`,`Anh ấy / Cô ấy là… của tôi`],[`It's in … / It's near …`,`Nó ở… / Nó gần…`]]},
+      {label:`Đặc điểm`, note:`có gì, trông ra sao`, items:[
+        [`It has …`,`Nó có…`],[`There are a lot of …`,`Ở đó có nhiều…`],[`It looks …`,`Trông nó…`],
+        [`He's / She's really [friendly / funny / smart].`,`Người đó rất [thân thiện / vui tính / thông minh]`]]},
+      {label:`Điểm nổi bật`, items:[
+        [`The best thing about it is …`,`Điều tuyệt nhất là…`],[`The only problem is …`,`Vấn đề duy nhất là…`]]},
+      {label:`Cảm xúc`, note:`để kết lại`, items:[
+        [`It makes me feel …`,`Nó làm tôi thấy…`],[`I really love it there.`,`Tôi rất thích ở đó`]]}
+    ],
+    tip:`Bẫy hay gặp: "What's your boss like?" là hỏi sếp bạn là người thế nào, không phải hỏi bạn có thích sếp không. Muốn hỏi ngoại hình, người ta nói "What does he look like?"`,
+    ex:{q:`Tell me about your hometown.`, a:`{{It's a small}} town in the north. {{It's near}} the sea. {{There are a lot of}} fishing boats, and the people are really friendly. {{The best thing about it is}} the seafood. {{The only problem is}} there aren't many jobs. I go back every Tết, and {{it makes me feel}} relaxed.`}
+  },
+  { id:5, short:`Kể chuyện`, name:`Kể chuyện đã qua`, q:`Tell me about a time when …`,
+    cue:[`a time when`,`have you ever`,`last weekend`,`how was`], opener:`I remember when …`,
+    asks:[`Tell me about a time when …`,`Have you ever …?`,`What did you do last …?`,`What's the best … you've ever …?`,`How was your …?`],
+    steps:[
+      {label:`Mở chuyện`, note:`khi nào`, items:[
+        [`I remember when …`,`Tôi nhớ có lần…`],[`Yes, once. …`,`Có, một lần…`],[`[Last year / Two years ago], I …`,`[Năm ngoái / Hai năm trước], tôi…`]]},
+      {label:`Bối cảnh`, note:`ở đâu, với ai`, items:[
+        [`I was in … with …`,`Tôi đang ở… cùng…`],[`It was [a rainy day / my first week at work].`,`Hôm đó là [một ngày mưa / tuần đầu đi làm]`]]},
+      {label:`Diễn biến`, items:[
+        [`First, … Then, … After that, …`,`Đầu tiên… Rồi… Sau đó…`],[`Suddenly, …`,`Bỗng nhiên…`]]},
+      {label:`Kết thúc`, items:[[`In the end, …`,`Cuối cùng thì…`]]},
+      {label:`Cảm xúc`, note:`hoặc bài học`, items:[
+        [`I felt [happy / nervous / surprised].`,`Tôi thấy [vui / hồi hộp / bất ngờ]`],[`It was [amazing / stressful / funny].`,`Chuyện đó thật [tuyệt / căng thẳng / buồn cười]`],
+        [`I learned that …`,`Tôi rút ra được là…`]]}
+    ],
+    tip:`Kể chuyện thì chia động từ ở quá khứ: go → went, see → saw, eat → ate, is → was, have → had. Lỡ chia sai thì cứ nói tiếp, người nghe vẫn hiểu.`,
+    ex:{q:`Have you ever gotten lost?`, a:`{{Yes, once.}} {{Two years ago}}, {{I was in}} Bangkok {{with}} my friends. {{First}}, we took the wrong bus. {{Then}}, my phone died. {{Suddenly}}, it started to rain. {{In the end}}, a kind man helped us find our hotel. {{It was stressful}}, but now it's a funny story.`}
+  },
+  { id:6, short:`Ý kiến`, name:`Nêu ý kiến`, q:`What do you think about …?`,
+    cue:[`think`,`opinion`,`feel about`,`a good idea`], opener:`In my opinion, …`,
+    asks:[`What do you think about …?`,`What's your opinion on …?`,`How do you feel about …?`,`Do you think … is a good idea?`],
+    steps:[
+      {label:`Quan điểm`, items:[
+        [`I think … / I believe …`,`Tôi nghĩ… / Tôi tin…`],[`In my opinion, …`,`Theo ý tôi…`],
+        [`Honestly, I'm not sure, but …`,`Thật lòng tôi không chắc, nhưng…`],[`It depends.`,`Còn tùy`]]},
+      {label:`Lý do`, items:[
+        [`One reason is … Another reason is …`,`Một lý do là… Lý do khác là…`],[`The main reason is …`,`Lý do chính là…`]]},
+      {label:`Mặt khác`, note:`cho thấy bạn nghĩ hai chiều`, items:[
+        [`But on the other hand, …`,`Nhưng mặt khác…`],[`However, some people think …`,`Tuy nhiên, có người cho rằng…`]]},
+      {label:`Kết luận`, items:[[`Overall, …`,`Nhìn chung…`],[`So for me, …`,`Nên với tôi thì…`]]},
+      {label:`Hỏi lại`, items:[[`What do you think?`,`Bạn nghĩ sao?`]]}
+    ],
+    tip:`Chưa có ý kiến rõ ràng thì mở bằng "It depends." rồi nói hai trường hợp: "If …, it's good. But if …, it's not."`,
+    ex:{q:`What do you think about working from home?`, a:`{{In my opinion}}, it's a good idea. {{One reason is}} I don't have to sit in traffic. {{Another reason is}} I can focus better. {{But on the other hand}}, it can feel lonely. {{Overall}}, I think a mix is best. {{What do you think?}}`}
+  },
+  { id:7, short:`So sánh`, name:`So sánh, chọn một`, q:`Which do you prefer, A or B?`,
+    cue:[`prefer`,`A or B?`,`would you rather`,`difference`], opener:`I prefer A to B.`,
+    asks:[`Which do you prefer, A or B?`,`Do you prefer A or B?`,`Would you rather … or …?`,`What's the difference between A and B?`],
+    steps:[
+      {label:`Chọn`, items:[
+        [`I prefer A to B.`,`Tôi thích A hơn B`],[`I'd rather …`,`Tôi muốn… hơn`],[`Definitely A.`,`Chắc chắn là A`],[`Hard to say. I like both.`,`Khó nói lắm, tôi thích cả hai`]]},
+      {label:`So sánh`, items:[
+        [`A is [cheaper / more convenient] than B.`,`A [rẻ / tiện] hơn B`],[`B is not as … as A.`,`B không… bằng A`]]},
+      {label:`Công nhận bên kia`, items:[
+        [`But B is better when …`,`Nhưng B tốt hơn khi…`],[`That said, …`,`Dù vậy thì…`]]},
+      {label:`Kết`, items:[[`So for me, A.`,`Nên với tôi thì chọn A`],[`It depends on the situation.`,`Còn tùy tình huống`]]},
+      {label:`Hỏi lại`, items:[[`Which one do you prefer?`,`Bạn thích cái nào hơn?`]]}
+    ],
+    tip:`Tính từ ngắn thì thêm "-er than" (cheaper than, bigger than). Tính từ dài thì dùng "more … than" (more convenient than).`,
+    ex:{q:`Do you prefer the city or the countryside?`, a:`{{I prefer}} the city {{to}} the countryside. {{It's more convenient}}, and there are more jobs. {{But}} the countryside {{is better when}} I want to relax, because it's {{not as}} noisy {{as}} the city. {{So for me}}, the city. {{Which one do you prefer?}}`}
+  },
+  { id:8, short:`Kế hoạch`, name:`Kế hoạch, mong muốn`, q:`What are your plans for …?`,
+    cue:[`plans`,`going to`,`would you like`,`if you could`], opener:`I'm planning to …`,
+    asks:[`What are your plans for …?`,`What are you going to do …?`,`Would you like to …?`,`If you could …, what would you do?`,`Where do you see yourself in five years?`],
+    steps:[
+      {label:`Dự định`, note:`chọn mức chắc chắn`, items:[
+        [`I'm going to …`,`Tôi sẽ… (đã quyết)`],[`I'm planning to …`,`Tôi dự định…`],[`I'm thinking about …-ing`,`Tôi đang tính…`],
+        [`I'd love to …`,`Tôi rất muốn…`],[`If I could, I would …`,`Nếu được, tôi sẽ…`]]},
+      {label:`Lý do`, items:[[`because …`,`vì…`],[`I want to … because …`,`Tôi muốn… vì…`]]},
+      {label:`Chi tiết`, note:`khi nào, làm thế nào`, items:[
+        [`Maybe [next month / next year].`,`Có lẽ [tháng sau / năm sau]`],[`First, I need to …`,`Trước tiên tôi cần…`]]},
+      {label:`Khả năng`, items:[[`It won't be easy, but …`,`Sẽ không dễ, nhưng…`],[`I hope …`,`Tôi hy vọng…`]]},
+      {label:`Hỏi lại`, items:[[`What about you? Any plans?`,`Còn bạn? Có dự định gì không?`]]}
+    ],
+    tip:`"I'm going to" là đã quyết. "I'm thinking about" là còn cân nhắc. "I'd love to" là mong muốn, chưa chắc sẽ làm.`,
+    ex:{q:`What are your plans for next year?`, a:`{{I'm planning to}} improve my English, {{because}} I need it for work. {{First, I need to}} practice speaking every day. {{I'm also thinking about}} traveling to Japan, {{maybe}} in spring. {{It won't be easy, but}} {{I hope}} I can do both. {{What about you? Any plans?}}`}
+  }
+];
+
+const QUESTIONS = {
+  1:[`Do you like music?`,`Do you enjoy cooking?`,`Are you into sports?`,`Do you like your job?`,`Do you like rainy days?`,`Do you enjoy shopping?`,`Are you a fan of video games?`,`Do you like living in your city?`,`Do you enjoy reading?`,`Do you like Mondays?`],
+  2:[`What's your favorite movie?`,`What kind of music do you like?`,`What's your favorite place in your city?`,`What's your favorite season?`,`Do you have a favorite app?`,`What's your favorite holiday?`,`What's your favorite drink?`,`What kind of books do you like?`,`Who's your favorite singer?`,`What's your favorite time of day?`],
+  3:[`How often do you eat out?`,`How often do you exercise?`,`Do you watch movies a lot?`,`How often do you travel?`,`How much time do you spend on your phone?`,`How often do you cook?`,`When was the last time you went to the cinema?`,`Do you often read the news?`,`How often do you call your parents?`,`How often do you go out for coffee?`],
+  4:[`Tell me about your hometown.`,`What's your best friend like?`,`Describe your house.`,`What's your office like?`,`Tell me about your family.`,`Describe your favorite café.`,`What does your city look like?`,`Tell me about your manager.`,`Describe your bedroom.`,`What's the weather like where you live?`],
+  5:[`Tell me about a time you were really happy.`,`Have you ever gotten lost?`,`What did you do last weekend?`,`What's the best trip you've ever taken?`,`Tell me about your first day at work.`,`Have you ever made a big mistake?`,`How was your last Tết holiday?`,`Tell me about a time you helped someone.`,`What's the best meal you've ever had?`,`Have you ever missed a flight or a bus?`],
+  6:[`What do you think about working from home?`,`What's your opinion on social media?`,`Do you think AI will change your job?`,`How do you feel about online shopping?`,`Is it a good idea for kids to have phones?`,`What do you think about the traffic in your city?`,`Do you think learning English is important?`,`What do you think about fast food?`,`What do you think about working overtime?`,`Do you think money makes people happy?`],
+  7:[`Do you prefer coffee or tea?`,`City or countryside?`,`Would you rather travel alone or with friends?`,`Do you prefer working from home or at the office?`,`Books or movies?`,`Do you prefer summer or winter?`,`Would you rather cook at home or eat out?`,`Do you prefer the beach or the mountains?`,`Big company or small company?`,`Do you prefer texting or calling?`],
+  8:[`What are your plans for this weekend?`,`What are you going to do next year?`,`Would you like to live abroad?`,`If you could travel anywhere, where would you go?`,`Where do you see yourself in five years?`,`Would you like to learn a new skill?`,`What are your plans for Tết?`,`If you had a free month, what would you do?`,`Would you like to start your own business?`,`What do you want to achieve this year?`]
+};
+
+const KIT = [
+  {title:`Câu giờ khi đang nghĩ`, items:[[`Well, …`,`À thì…`],[`Let me think…`,`Để tôi nghĩ chút`],[`That's a good question.`,`Câu hỏi hay đấy`],[`How can I say this…`,`Nói sao nhỉ…`],[`I mean, …`,`Ý tôi là…`]]},
+  {title:`Nói thêm khi còn muốn kể`, items:[[`Also, …`,`Ngoài ra…`],[`And another thing, …`,`Còn một điều nữa…`],[`On top of that, …`,`Thêm vào đó…`],[`To be honest, …`,`Nói thật thì…`],[`Actually, …`,`Thật ra…`]]},
+  {title:`Khi bí từ`, items:[[`It's a kind of …`,`Nó là một loại…`],[`It's something you use to …`,`Đó là thứ dùng để…`],[`It's like …, but …`,`Nó giống…, nhưng…`],[`I forgot the word, but …`,`Tôi quên từ rồi, nhưng…`]]},
+  {title:`Khi nghe không kịp`, items:[[`Sorry, could you say that again?`,`Xin lỗi, bạn nói lại được không?`],[`Do you mean …?`,`Ý bạn là…?`],[`Sorry, what does … mean?`,`Xin lỗi, … nghĩa là gì?`]]},
+  {title:`Hỏi lại để giữ nhịp`, items:[[`What about you?`,`Còn bạn?`],[`What do you think?`,`Bạn nghĩ sao?`],[`Have you ever …?`,`Bạn đã bao giờ… chưa?`],[`Really? Why?`,`Thật à? Sao vậy?`]]},
+  {title:`Kết câu trả lời`, items:[[`So yeah, that's it.`,`Đại khái là vậy`],[`Anyway, …`,`Dù sao thì…`],[`That's why I …`,`Đó là lý do tôi…`]]}
+];
+
+const ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = s => esc(s)
+  .replace(/\{\{(.+?)\}\}/g, '<mark>$1</mark>')
+  .replace(/\[(.+?)\]/g, '<span class="opt">$1</span>')
+  .replace(/…/g, '<span class="slot"></span>');
+const plain = s => String(s).replace(/\{\{|\}\}/g, '').replace(/[\[\]]/g, '').replace(/ \/ /g, ', ').replace(/…/g, '');
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch(e) {} }
+};
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Speech */
+const canSpeak = 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
+document.documentElement.classList.add(canSpeak ? 'has-speech' : 'no-speech');
+function speak(text){
+  if (!canSpeak) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(plain(text));
+    u.lang = 'en-US'; u.rate = 0.9;
+    const voices = speechSynthesis.getVoices();
+    const v = voices.find(x => /^en[-_]US/i.test(x.lang)) || voices.find(x => /^en/i.test(x.lang));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch(e) {}
+}
+if (canSpeak) { try { speechSynthesis.getVoices(); } catch(e) {} }
+
+/* Map */
+$('#mapList').innerHTML = FRAMES.map(f => `
+  <button class="map-row" type="button" data-id="${f.id}" aria-label="Mở khung dạng ${f.id}: ${esc(f.name)}">
+    <span class="num">${f.id}</span>
+    <span class="mcues">${f.cue.map(c => `<span class="cue">${fmt(c)}</span>`).join('')}</span>
+    <span class="mtype"><span class="en">${fmt(f.q)}</span><small>${esc(f.name)}</small></span>
+    <span class="mopen">${fmt(f.opener)}</span>
+  </button>`).join('');
+$('#mapList').addEventListener('click', e => {
+  const b = e.target.closest('.map-row');
+  if (b) selectFrame(+b.dataset.id, true);
+});
+
+/* Frames */
+$('#chips').innerHTML = FRAMES.map(f => `<button type="button" class="chip" data-id="${f.id}" aria-pressed="false"><b>${f.id}</b>${esc(f.short)}</button>`).join('');
+const quizEl = $('#quiz');
+let current = FRAMES[0];
+
+function renderFrame(f){
+  $('#frame').innerHTML = `
+    <header class="frame-head">
+      <span class="frame-num">${f.id}</span>
+      <div><h3 class="frame-q">${fmt(f.q)}</h3><p class="frame-name">${esc(f.name)}</p></div>
+    </header>
+    <div class="frame-body">
+      <ol class="steps">${f.steps.map((s, i) => `
+        <li class="step">
+          <span class="step-n">${i + 1}</span>
+          <div>
+            <p class="step-label">${esc(s.label)}${s.note ? ` <span>· ${esc(s.note)}</span>` : ''}</p>
+            <ul class="vars reveal">${s.items.map(([en, vi]) => `<li data-say="${esc(en)}"><span class="en">${fmt(en)}</span><span class="vi">${esc(vi)}</span></li>`).join('')}</ul>
+          </div>
+        </li>`).join('')}
+      </ol>
+      <div class="side">
+        <div>
+          <h4>Người ta cũng hỏi kiểu này</h4>
+          <div class="asks">${f.asks.map(a => `<span class="ask">${fmt(a)}</span>`).join('')}</div>
+        </div>
+        <div class="example">
+          <h4>Câu trả lời mẫu</h4>
+          <div class="ex-q"><span>${esc(f.ex.q)}</span><button class="btn icon-btn speak" type="button" data-say-ex aria-label="Nghe câu trả lời mẫu">${ICON}</button></div>
+          <div class="reveal"><p class="ex-a">${fmt(f.ex.a)}</p></div>
+        </div>
+        <div class="tip">
+          <h4>Mẹo</h4>
+          <p>${esc(f.tip)}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function applyQuiz(){
+  const on = quizEl.checked;
+  $('#frame').classList.toggle('quiz', on);
+  $$('#frame .reveal').forEach(r => {
+    r.classList.remove('shown');
+    if (on) { r.tabIndex = 0; r.setAttribute('role', 'button'); r.setAttribute('aria-label', 'Bấm để xem đáp án'); }
+    else { r.removeAttribute('tabindex'); r.removeAttribute('role'); r.removeAttribute('aria-label'); }
+  });
+}
+function reveal(r){
+  r.classList.add('shown');
+  r.removeAttribute('tabindex'); r.removeAttribute('role'); r.removeAttribute('aria-label');
+}
+
+function selectFrame(id, scroll){
+  current = FRAMES.find(f => f.id === id) || FRAMES[0];
+  $$('#chips .chip').forEach(c => c.setAttribute('aria-pressed', String(+c.dataset.id === current.id)));
+  renderFrame(current);
+  applyQuiz();
+  store.set('kcpx-frame', String(current.id));
+  $('#prev').disabled = current.id === 1;
+  $('#next').disabled = current.id === FRAMES.length;
+  const chips = $('#chips'), chip = $(`#chips .chip[data-id="${current.id}"]`);
+  if (chip && chips.scrollWidth > chips.clientWidth) chips.scrollLeft = chip.offsetLeft - chips.offsetLeft - 24;
+  if (scroll) $('#frames').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+}
+
+$('#chips').addEventListener('click', e => {
+  const c = e.target.closest('.chip');
+  if (c) selectFrame(+c.dataset.id);
+});
+$('#prev').addEventListener('click', () => selectFrame(current.id - 1));
+$('#next').addEventListener('click', () => selectFrame(current.id + 1));
+quizEl.addEventListener('change', applyQuiz);
+$('#frame').addEventListener('click', e => {
+  const r = e.target.closest('.reveal');
+  if (quizEl.checked && r && !r.classList.contains('shown')) { reveal(r); return; }
+  if (e.target.closest('[data-say-ex]')) { speak(current.ex.q + ' ... ' + current.ex.a); return; }
+  const li = e.target.closest('li[data-say]');
+  if (li) speak(li.dataset.say);
+});
+$('#frame').addEventListener('keydown', e => {
+  const r = e.target.closest('.reveal');
+  if (quizEl.checked && r && !r.classList.contains('shown') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); reveal(r); }
+});
+
+/* Kit */
+$('#kitGrid').innerHTML = KIT.map(g => `
+  <div class="kit-group">
+    <h3>${esc(g.title)}</h3>
+    <ul class="vars">${g.items.map(([en, vi]) => `<li data-say="${esc(en)}"><span class="en">${fmt(en)}</span><span class="vi">${esc(vi)}</span></li>`).join('')}</ul>
+  </div>`).join('');
+$('#kitGrid').addEventListener('click', e => {
+  const li = e.target.closest('li[data-say]');
+  if (li) speak(li.dataset.say);
+});
+
+/* Drill */
+const ALLQ = FRAMES.flatMap(f => QUESTIONS[f.id].map(q => ({ q, t: f.id })));
+const DUR = 30000;
+let dq = ALLQ[0], count = 1, tId = null, endAt = 0;
+$('#dtype').innerHTML = `<option value="all">Trộn cả 8 dạng</option>` +
+  FRAMES.map(f => `<option value="${f.id}">${f.id} · ${esc(f.short)} · ${esc(f.q)}</option>`).join('');
+$('#dspeak').innerHTML = ICON;
+
+function setQ(item){ dq = item; $('#dq').textContent = item.q; hideHint(); }
+function pickQ(){
+  const t = $('#dtype').value;
+  const pool = t === 'all' ? ALLQ : ALLQ.filter(x => String(x.t) === t);
+  let n, guard = 0;
+  do { n = pool[Math.floor(Math.random() * pool.length)]; guard++; } while (pool.length > 1 && n === dq && guard < 20);
+  return n;
+}
+function stopTimer(){ clearInterval(tId); tId = null; }
+function resetTimer(){
+  stopTimer();
+  $('#dbar').style.width = '100%';
+  $('#dsec').textContent = '30 giây';
+  $('#timer').classList.remove('low', 'done');
+  $('#dstart').textContent = 'Bắt đầu 30 giây';
+}
+function tick(){
+  const left = Math.max(0, endAt - Date.now());
+  $('#dbar').style.width = (left / DUR * 100) + '%';
+  $('#dsec').textContent = left > 0 ? Math.ceil(left / 1000) + ' giây' : 'Hết giờ';
+  $('#timer').classList.toggle('low', left > 0 && left <= 10000);
+  if (left <= 0) { stopTimer(); $('#timer').classList.add('done'); $('#dstart').textContent = 'Thử lại câu này'; }
+}
+function startTimer(){
+  stopTimer();
+  endAt = Date.now() + DUR;
+  $('#timer').classList.remove('low', 'done');
+  $('#dstart').textContent = 'Nói lại từ đầu';
+  tick();
+  tId = setInterval(tick, 100);
+}
+function showHint(){
+  const f = FRAMES.find(x => x.id === dq.t);
+  const box = $('#hintbox');
+  box.innerHTML = `
+    <p class="hint-type">Dạng ${f.id} · <span class="en">${fmt(f.q)}</span> <span class="muted">${esc(f.name)}</span></p>
+    <ol class="hint-steps">${f.steps.map((s, i) => `<li><span class="hn">${i + 1}</span><span><b>${esc(s.label)}</b><span class="en">${fmt(s.items[0][0])}</span></span></li>`).join('')}</ol>
+    <button type="button" class="linkbtn" data-open="${f.id}">Mở khung đầy đủ của dạng ${f.id}</button>`;
+  box.hidden = false;
+  $('#dhint').setAttribute('aria-expanded', 'true');
+  $('#dhint').textContent = 'Ẩn gợi ý';
+}
+function hideHint(){
+  $('#hintbox').hidden = true;
+  $('#dhint').setAttribute('aria-expanded', 'false');
+  $('#dhint').textContent = 'Xem gợi ý khung';
+}
+$('#dstart').addEventListener('click', startTimer);
+$('#dnext').addEventListener('click', () => {
+  count++;
+  $('#dcount').textContent = 'Câu ' + count;
+  setQ(pickQ());
+  startTimer();
+});
+$('#dtype').addEventListener('change', () => { setQ(pickQ()); resetTimer(); });
+$('#dhint').addEventListener('click', () => { $('#hintbox').hidden ? showHint() : hideHint(); });
+$('#dspeak').addEventListener('click', () => speak(dq.q));
+$('#hintbox').addEventListener('click', e => {
+  const b = e.target.closest('[data-open]');
+  if (b) selectFrame(+b.dataset.open, true);
+});
+
+/* Init */
+const saved = parseInt(store.get('kcpx-frame'), 10);
+selectFrame(saved >= 1 && saved <= FRAMES.length ? saved : 1);
+setQ(ALLQ[0]);
+</script>
+</body>
+</html>
