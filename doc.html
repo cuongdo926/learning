@@ -68,6 +68,25 @@ body.locked{overflow:hidden}
 .doc th,.doc td{padding:9px 12px;text-align:left;vertical-align:top;border-top:1px solid var(--line);min-width:6.5em}
 .doc thead th{background:var(--sunk);font-size:13px;font-weight:700;border-top:0}
 .doc td strong{background:var(--hl);color:var(--hl-ink);padding:0 .15em;border-radius:3px;font-weight:700}
+.doc .c-num{min-width:0;width:1%;white-space:nowrap}
+
+/* Tables as stacked cards on narrow screens (class added by script when a table would overflow) */
+.table-wrap.stack{overflow:visible;background:transparent;border:0;border-radius:0}
+.stack table,.stack tbody{display:block;width:100%}
+.stack thead{display:none}
+.stack tr{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.stack tr.empty-row{display:none}
+.stack td{display:block;flex:1 1 100%;min-width:0;border:0;padding:0}
+.stack td.empty{display:none}
+.stack td.c-num{flex:0 0 auto;width:auto;font-weight:800;color:var(--accent)}
+.stack td.c-title{flex:1 1 0;font-weight:700;font-size:16px}
+.stack td.c-bad{font-size:14px}
+.stack td.c-bad::before{content:"❌ "}
+.stack td.c-good{font-size:17px;font-weight:600;line-height:1.45}
+.stack td.c-good::before{content:"✅ "}
+.stack td.c-good em{display:block;font-size:14px;font-weight:400;margin-top:2px}
+.stack td.c-other{font-size:15px}
+.stack td.c-other[data-label]:not([data-label=""])::before{content:attr(data-label) ": ";color:var(--muted);font-size:13px;font-weight:600}
 .doc details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:.4em 0 1.4em}
 .doc summary{cursor:pointer;font-weight:700;color:var(--accent)}
 .doc details[open] summary{margin-bottom:6px}
@@ -176,7 +195,7 @@ function buildNav() {
 }
 
 function currentIndex() {
-  const offset = document.querySelector('.bar').getBoundingClientRect().bottom + 24;
+  const offset = document.querySelector('.bar').getBoundingClientRect().bottom + window.innerHeight * 0.3;
   let c = -1;
   for (let i = 0; i < heads.length; i++) {
     if (heads[i].getBoundingClientRect().top <= offset) c = i; else break;
@@ -243,6 +262,47 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !$('scrim').hidden) closeSheet();
 });
 
+/* Tables: tag each column with a role so a row can be shown as a card on narrow screens */
+function prepTable(t, w) {
+  const ths = Array.from(t.querySelectorAll('thead th'));
+  const heads = ths.map(th => th.textContent.trim());
+  let titled = false;
+  const roles = heads.map(h => {
+    if (h === '#') return 'c-num';
+    if (/^❌/.test(h)) return 'c-bad';
+    if (/^✅/.test(h)) return 'c-good';
+    if (!titled) { titled = true; return 'c-title'; }
+    return 'c-other';
+  });
+  ths.forEach((th, i) => th.classList.add(roles[i]));
+  t.querySelectorAll('tbody tr').forEach(tr => {
+    let allEmpty = true;
+    Array.from(tr.children).forEach((td, i) => {
+      const role = roles[i] || 'c-other';
+      td.classList.add(role);
+      if (role === 'c-other') td.dataset.label = heads[i] || '';
+      if (td.textContent.trim()) allEmpty = false; else td.classList.add('empty');
+    });
+    if (allEmpty) tr.classList.add('empty-row');
+  });
+  if (roles.includes('c-good')) w.classList.add('trap');
+}
+function fitTables() {
+  const narrow = window.innerWidth < 600;
+  document.querySelectorAll('.table-wrap').forEach(w => {
+    w.classList.remove('stack');
+    const overflow = w.querySelector('table').scrollWidth > w.clientWidth + 4;
+    if (overflow || (narrow && w.classList.contains('trap'))) w.classList.add('stack');
+  });
+}
+let resizeTick = false;
+window.addEventListener('resize', () => {
+  if (resizeTick) return;
+  resizeTick = true;
+  requestAnimationFrame(() => { resizeTick = false; fitTables(); if (heads.length) update(); });
+});
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (document.querySelector('.table-wrap')) fitTables(); });
+
 /* Render */
 function enhance() {
   docEl.querySelectorAll('h1, h2, h3, h4').forEach(h => { if (!h.id) h.id = slug(h.textContent); });
@@ -251,7 +311,9 @@ function enhance() {
     w.className = 'table-wrap';
     t.parentNode.insertBefore(w, t);
     w.appendChild(t);
+    prepTable(t, w);
   });
+  fitTables();
   docEl.querySelectorAll('a[href]').forEach(a => {
     const href = a.getAttribute('href');
     const m = href.match(/^([\w-]+\.md)(#.*)?$/);
