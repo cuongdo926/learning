@@ -43,7 +43,10 @@ h1,h2,h3{text-wrap:balance}
 kbd{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;border:1px solid currentColor;border-radius:4px;padding:0 5px;opacity:.7}
 
 /* Header */
-.intro{padding-block:36px 8px}
+.intro{padding-block:24px 8px}
+.home-link{display:inline-block;font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;margin-bottom:14px}
+.home-link:hover{color:var(--accent)}
+.foot a{color:var(--accent)}
 .eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0}
 h1{font-size:clamp(2rem,5.5vw,3rem);line-height:1.08;margin:.2em 0 .3em;font-weight:800;letter-spacing:-.02em}
 .lede{max-width:60ch;color:var(--muted);font-size:1.0625rem;margin:0}
@@ -162,6 +165,7 @@ select{min-width:0;flex:1 1 260px}
 </head>
 <body>
 <header class="wrap intro">
+  <a class="home-link" href="index.html">← Trang chủ</a>
   <p class="eyebrow" id="eyebrow">Tiếng Anh tự nhiên</p>
   <h1>Bẫy Dịch Việt → Anh</h1>
   <p class="lede">Nhìn câu tiếng Việt, tự nói câu tiếng Anh trong đầu, rồi lật thẻ xem người bản xứ nói thế nào. Câu nào nhớ rồi thì bấm "Nhớ rồi", câu nào chưa thì thẻ sẽ quay lại sau.</p>
@@ -257,7 +261,7 @@ select{min-width:0;flex:1 1 260px}
 </main>
 
 <footer class="wrap foot">
-  <span>Tiến độ được lưu trong trình duyệt này. Tài liệu đầy đủ: bay-dich-viet-anh.md</span>
+  <span>Tiến độ được lưu trong trình duyệt này. <a href="doc.html?f=bay-dich-viet-anh.md">Đọc tài liệu đầy đủ</a></span>
   <button class="linkbtn" type="button" id="bReset">Xóa tiến độ</button>
 </footer>
 

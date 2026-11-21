@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Học Nói Tiếng Anh</title>
+<meta name="description" content="Bộ tài liệu tự học nói tiếng Anh: khung câu để nói dài và bẫy dịch Việt Anh để nói tự nhiên.">
+<meta name="theme-color" content="#2445C8">
+<meta name="apple-mobile-web-app-title" content="Học Nói">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232445C8'/%3E%3Cpath d='M16 20h32a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H30l-9 7v-7h-5a4 4 0 0 1-4-4V24a4 4 0 0 1 4-4z' fill='%23FFE36E'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
+<style>
+/* Layout: hub. Intro -> two tool cards -> daily routine -> home-screen tip */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --sunk:#E8ECF3; --ink:#141B2D; --muted:#566178; --line:#D8DEE8;
+  --accent:#2445C8; --accent-soft:#E2E8FF; --on-accent:#FFFFFF; --hl:#FFE36E; --hl-ink:#141B2D;
+  --font-display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --font-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D121B; --surface:#151C29; --sunk:#1C2534; --ink:#E6EAF2; --muted:#9AA4B7; --line:#273145;
+    --accent:#8AA4FF; --accent-soft:#1E2A4A; --on-accent:#0D121B; --hl:rgba(255,214,77,.22); --hl-ink:#FFE79A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D121B; --surface:#151C29; --sunk:#1C2534; --ink:#E6EAF2; --muted:#9AA4B7; --line:#273145;
+  --accent:#8AA4FF; --accent-soft:#1E2A4A; --on-accent:#0D121B; --hl:rgba(255,214,77,.22); --hl-ink:#FFE79A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 56px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2{text-wrap:balance}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0}
+h1{font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.05;margin:.2em 0 .35em;font-weight:800;letter-spacing:-.02em}
+.lede{max-width:58ch;color:var(--muted);font-size:1.0625rem;margin:0}
+.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:32px}
+@media (max-width:680px){.tools{grid-template-columns:minmax(0,1fr)}}
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.tool-tag{margin:0;align-self:flex-start;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--hl);color:var(--hl-ink);border-radius:6px;padding:2px 8px}
+.tool h2{margin:0;font-family:var(--font-display);font-size:1.6rem;line-height:1.15;font-weight:800}
+.tool p{margin:0;color:var(--muted)}
+.tool-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+.btn{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;border-radius:12px;padding:11px 16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+section{margin-top:40px}
+section h2{font-size:1.3rem;margin:0 0 12px;font-weight:800}
+.plan{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.plan li{display:flex;gap:14px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.min{flex:none;min-width:4.6em;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.homescreen p{margin:0 0 6px;color:var(--muted)}
+.homescreen b{color:var(--ink)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <p class="eyebrow">Bộ tài liệu tự học</p>
+    <h1>Học Nói Tiếng Anh</h1>
+    <p class="lede">Hai bộ công cụ bổ trợ cho nhau: một bộ giúp bạn nói được dài, một bộ giúp câu nói nghe tự nhiên. Mỗi bộ có phần luyện tập và tài liệu đọc.</p>
+  </header>
+
+  <div class="tools">
+    <article class="tool">
+      <p class="tool-tag">Nói được dài</p>
+      <h2>Khung Câu Phản Xạ</h2>
+      <p>8 dạng câu hỏi giao tiếp, mỗi dạng một khung trả lời có biến thể và câu mẫu, cùng 80 câu hỏi luyện với đồng hồ 30 giây.</p>
+      <div class="tool-actions">
+        <a class="btn primary" href="khung-cau-phan-xa.html">Luyện tập</a>
+        <a class="btn" href="doc.html?f=khung-cau-phan-xa.md">Đọc tài liệu</a>
+      </div>
+    </article>
+    <article class="tool">
+      <p class="tool-tag">Nói cho tự nhiên</p>
+      <h2>Bẫy Dịch Việt → Anh</h2>
+      <p>279 câu người Việt hay dịch sai, gom thành 24 quy luật có mẹo nhớ. Luyện bằng thẻ nhớ và trắc nghiệm chọn câu đúng.</p>
+      <div class="tool-actions">
+        <a class="btn primary" href="bay-dich-viet-anh.html">Luyện thẻ</a>
+        <a class="btn" href="doc.html?f=bay-dich-viet-anh.md">Đọc tài liệu</a>
+      </div>
+    </article>
+  </div>
+
+  <section>
+    <h2>Mỗi ngày 20 phút</h2>
+    <ol class="plan">
+      <li><span class="min">5 phút</span><div><b>Bẫy dịch:</b> 2 quy luật theo lộ trình 12 ngày. Đọc mẹo nhớ, rồi lật thẻ đến khi nhớ hết.</div></li>
+      <li><span class="min">5 phút</span><div><b>Khung câu:</b> 1 dạng mỗi ngày. Trả lời to 5 câu hỏi ngẫu nhiên của dạng đó.</div></li>
+      <li><span class="min">10 phút</span><div><b>Luyện nói:</b> trả lời câu hỏi với Claude để được sửa lỗi và gợi ý cách nói tự nhiên.</div></li>
+    </ol>
+  </section>
+
+  <section class="homescreen">
+    <h2>Mở nhanh như một app</h2>
+    <p><b>iPhone (Safari):</b> bấm nút Chia sẻ, chọn "Thêm vào MH chính".</p>
+    <p><b>Android (Chrome):</b> bấm dấu ba chấm ở góc trên, chọn "Thêm vào màn hình chính".</p>
+  </section>
+</main>
+</body>
+</html>
